@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a2e">
+<title>Thesis Defense Prep</title>
+<link rel="manifest" href="manifest.json">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --bg: #1a1a2e;
+  --surface: #16213e;
+  --card: #0f3460;
+  --accent: #e94560;
+  --green: #4ecca3;
+  --yellow: #f0c929;
+  --text: #eee;
+  --muted: #8892b0;
+  --radius: 16px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* --- NAV BAR --- */
+.nav {
+  display: flex;
+  justify-content: space-around;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 100;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.nav button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+.nav button.active { color: var(--accent); }
+.nav button svg { width: 22px; height: 22px; }
+
+/* --- SCREENS --- */
+.screen { display:none; padding: 20px 16px 100px; min-height:100dvh; max-width:600px; margin:0 auto; }
+.screen.active { display:block; }
+.screen#study {
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+.screen#study.active { display:flex; }
+.study-header, .card-container, .card-hint, .action-buttons, .empty-state { width:100%; }
+
+/* --- STUDY SCREEN --- */
+.study-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.study-header h2 { font-size: 18px; font-weight: 600; }
+.progress-pill {
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--surface);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.card-container {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  min-height: 340px;
+}
+.card {
+  position: relative;
+  width: 100%;
+  min-height: 340px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card.flipped { transform: rotateY(180deg); }
+.card-face {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  min-height: 340px;
+  backface-visibility: hidden;
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+}
+.card-front {
+  background: linear-gradient(135deg, var(--card), #1a1a4e);
+  border: 1px solid rgba(233,69,96,0.2);
+}
+.card-back {
+  background: linear-gradient(135deg, #0a3d2e, #162e20);
+  border: 1px solid rgba(78,204,163,0.3);
+  transform: rotateY(180deg);
+}
+.card-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+.badge-easy { background: rgba(78,204,163,0.2); color: var(--green); }
+.badge-medium { background: rgba(240,201,41,0.2); color: var(--yellow); }
+.badge-hard { background: rgba(233,69,96,0.2); color: var(--accent); }
+.badge-ch { background: rgba(255,255,255,0.08); color: var(--muted); }
+.badge-type { background: rgba(233,69,96,0.15); color: #ff8fa3; }
+.card-question {
+  font-size: 17px;
+  line-height: 1.5;
+  flex: 1;
+}
+.card-answer {
+  font-size: 15px;
+  line-height: 1.6;
+  flex: 1;
+  color: #c8e6c9;
+}
+.card-jury {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.card-hint {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+.btn:active { transform: scale(0.95); }
+.btn-wrong { background: rgba(233,69,96,0.2); color: var(--accent); }
+.btn-right { background: rgba(78,204,163,0.2); color: var(--green); }
+.btn-skip { background: rgba(255,255,255,0.06); color: var(--muted); font-size:13px; padding:10px 20px; }
+
+.empty-state {
+  text-align: center;
+  margin-top: 80px;
+  color: var(--muted);
+}
+.empty-state h3 { font-size: 20px; margin-bottom: 8px; color: var(--green); }
+.btn-restart {
+  margin-top: 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* --- FILTER SCREEN --- */
+.filter-section { margin-bottom: 24px; }
+.filter-section h3 { font-size: 15px; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chip.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(233,69,96,0.1);
+}
+.filter-actions { margin-top: 24px; display: flex; gap: 12px; }
+.btn-apply {
+  flex: 1;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-clear {
+  background: rgba(255,255,255,0.06);
+  color: var(--muted);
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* --- STATS SCREEN --- */
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.stat-card h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+.stat-label { font-size: 14px; }
+.stat-value { font-size: 14px; font-weight: 600; }
+.stat-value.green { color: var(--green); }
+.stat-value.red { color: var(--accent); }
+.stat-value.yellow { color: var(--yellow); }
+.progress-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.mastery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 8px);
+  gap: 3px;
+  margin-top: 8px;
+}
+.mastery-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.mastery-dot.unseen { background: rgba(255,255,255,0.06); }
+.mastery-dot.wrong { background: var(--accent); }
+.mastery-dot.learning { background: var(--yellow); }
+.mastery-dot.mastered { background: var(--green); }
+
+.btn-reset-stats {
+  margin-top: 20px;
+  width: 100%;
+  background: rgba(233,69,96,0.1);
+  color: var(--accent);
+  border: 1px solid rgba(233,69,96,0.2);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div id="study" class="screen active">
+  <div class="study-header">
+    <h2>Thesis Defense</h2>
+    <span class="progress-pill" id="progressPill">0 / 0</span>
+  </div>
+  <div class="card-container">
+    <div class="card" id="flashcard" onclick="flipCard()">
+      <div class="card-face card-front" id="cardFront"></div>
+      <div class="card-face card-back" id="cardBack"></div>
+    </div>
+  </div>
+  <p class="card-hint" id="cardHint">Tap card to reveal answer</p>
+  <div class="action-buttons" id="actionButtons" style="display:none">
+    <button class="btn btn-wrong" onclick="answer(false)">Got it wrong</button>
+    <button class="btn btn-skip" onclick="skipCard()">Skip</button>
+    <button class="btn btn-right" onclick="answer(true)">Got it right</button>
+  </div>
+  <div class="empty-state" id="emptyState" style="display:none">
+    <h3>Session complete</h3>
+    <p>You've reviewed all filtered cards.</p>
+    <button class="btn-restart" onclick="restartSession()">Start again</button>
+  </div>
+</div>
+
+<div id="filter" class="screen">
+  <h2 style="margin-bottom:20px">Filters</h2>
+  <div class="filter-section">
+    <h3>Difficulty</h3>
+    <div class="filter-chips" id="diffChips"></div>
+  </div>
+  <div class="filter-section">
+    <h3>Chapter</h3>
+    <div class="filter-chips" id="chChips"></div>
+  </div>
+  <div class="filter-section">
+    <h3>Jury Member</h3>
+    <div class="filter-chips" id="juryChips"></div>
+  </div>
+  <div class="filter-section">
+    <h3>Type</h3>
+    <div class="filter-chips" id="typeChips"></div>
+  </div>
+  <div class="filter-section">
+    <h3>Status</h3>
+    <div class="filter-chips" id="statusChips"></div>
+  </div>
+  <div class="filter-actions">
+    <button class="btn-clear" onclick="clearFilters()">Clear all</button>
+    <button class="btn-apply" onclick="applyFilters()">Apply</button>
+  </div>
+</div>
+
+<div id="stats" class="screen">
+  <h2 style="margin-bottom:20px">Progress</h2>
+  <div class="stat-card">
+    <h3>Overview</h3>
+    <div class="stat-row"><span class="stat-label">Total cards</span><span class="stat-value" id="sTotalCards">0</span></div>
+    <div class="stat-row"><span class="stat-label">Seen</span><span class="stat-value" id="sSeenCards">0</span></div>
+    <div class="stat-row"><span class="stat-label">Mastered</span><span class="stat-value green" id="sMastered">0</span></div>
+    <div class="stat-row"><span class="stat-label">Learning</span><span class="stat-value yellow" id="sLearning">0</span></div>
+    <div class="stat-row"><span class="stat-label">Struggling</span><span class="stat-value red" id="sStruggling">0</span></div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressBar" style="width:0;background:var(--green)"></div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <h3>By Difficulty</h3>
+    <div id="statsByDiff"></div>
+  </div>
+  <div class="stat-card">
+    <h3>By Chapter</h3>
+    <div id="statsByCh"></div>
+  </div>
+  <div class="stat-card">
+    <h3>Mastery Map</h3>
+    <div class="mastery-grid" id="masteryGrid"></div>
+    <div style="display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--muted)">
+      <span><span style="display:inline-block;width:8px;height:8px;background:rgba(255,255,255,0.06);border-radius:2px"></span> Unseen</span>
+      <span><span style="display:inline-block;width:8px;height:8px;background:var(--accent);border-radius:2px"></span> Wrong</span>
+      <span><span style="display:inline-block;width:8px;height:8px;background:var(--yellow);border-radius:2px"></span> Learning</span>
+      <span><span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:2px"></span> Mastered</span>
+    </div>
+  </div>
+  <button class="btn-reset-stats" onclick="resetStats()">Reset all progress</button>
+</div>
+
+<nav class="nav">
+  <button class="active" onclick="showScreen('study')" id="navStudy">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    Study
+  </button>
+  <button onclick="showScreen('filter')" id="navFilter">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+    Filter
+  </button>
+  <button onclick="showScreen('stats')" id="navStats">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+    Stats
+  </button>
+</nav>
+
+<script>
+// ========== DATA ==========
+const ALL_CARDS = [{"id": "a0cc-Q1", "q": "Why did you choose the BCC model over the CCR model for this application?", "a": "The BCC model allows variable returns to scale, which is essential because S&P 500 constituents range from mid-cap to trillion-dollar enterprises. The CCR model's constant returns assumption would incorrectly penalize firms operating at non-optimal scales. Additionally, the BCC model's output translation invariance ensures efficiency rankings are preserved when output values are shifted by constants.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch2", "type": "base"}, {"id": "a0cc-Q2", "q": "Explain the mathematical formulation of the BCC model you implemented. What is the purpose of the convexity constraint?", "a": "The BCC model maximizes the ratio of weighted outputs to weighted inputs, subject to the constraint that no firm's efficiency exceeds unity. The convexity constraint $\\sum_{j=1}^{J} \\lambda_j = 1$ distinguishes it from CCR, allowing the efficiency frontier to exhibit variable returns to scale. This constraint ensures that inefficient units are projected onto a convex combination of efficient peers rather than requiring proportional scaling.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "easy", "ch": "ch2", "type": "base"}, {"id": "a0cc-Q3", "q": "Your DEA model uses input orientation. What does this mean and why is it appropriate for financial applications?", "a": "Input orientation seeks to minimize inputs while holding outputs constant, evaluating how much a firm could reduce its resource consumption (debt, leverage) while maintaining its performance (profitability, growth). This is appropriate for financial analysis because management has more direct control over capital structure and operational efficiency than over market-determined outputs like revenue or valuation multiples in the short term.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "hard", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q4", "q": "How did you categorize the 18 financial metrics as inputs versus outputs? What criteria guided this decision?", "a": "The categorization was optimized through a greedy search algorithm that maximizes the Pearson correlation between per-quarter DEA efficiency scores and stock returns over the training period. The algorithm iteratively tests each uncategorized metric as both input and output, selecting the assignment that produces higher correlation. The initial categorization is informed by financial theory: liabilities/leverage as inputs, profitability/growth as outputs.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q5", "q": "Explain the RFSI calculation process. How do you aggregate quarterly efficiency scores into a single metric?", "a": "The DEA model is run independently for each quarter, producing per-quarter efficiency scores for all firms. The RFSI is then computed by averaging these quarterly scores, yielding a single normalized value in [0,1] representing the firm's relative financial strength over the entire training period. Scores are clamped to [0,1] to correct floating-point arithmetic artifacts from the LP solver.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q6", "q": "What LP solver do you use for the DEA model and why? What are the computational constraints?", "a": "The implementation uses PuLP with the CBC (COIN-OR Branch and Cut) solver. CBC is an open-source linear programming solver that handles the BCC model's constraints efficiently without licensing costs. The computational complexity scales as O(J²) where J is the number of firms, as each of J DMUs requires solving a separate LP with J constraints.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q7", "q": "In your DEA formulation, what is the role of the epsilon parameter ($\\epsilon = 10^{-6}$)? Why is it necessary?", "a": "The epsilon parameter serves as a minimum weight threshold in the LP formulation to prevent degeneracy, ensuring that all inputs and outputs receive at least a small positive weight. Without this constraint, the optimal solution could assign zero weight to certain dimensions, producing efficiency scores that ignore important financial metrics. The small value ($10^{-6}$) ensures numerical stability without materially affecting efficiency rankings.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "hard", "ch": "ch2", "type": "base"}, {"id": "a0cc-Q8", "q": "The thesis mentions that BCC efficiency scores can cluster near 1.0, particularly in a single sector. Why does this happen and how does it affect asset selection?", "a": "BCC constructs the efficiency frontier from the data itself, so any firm that is \"best in class\" on a single dimension automatically receives a high score. In a homogeneous sector with many high-quality firms, this produces right-skewed score distributions with limited discrimination. The technical scoring layer becomes essential for differentiating among the many near-efficient firms, which is why the framework combines RFSI with momentum indicators.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q9", "q": "What is the difference between the CCR and BCC efficiency frontiers geometrically?", "a": "The CCR frontier is a conical hull through the origin with constant slope, representing constant returns to scale. The BCC frontier is a piecewise-linear convex hull that does not pass through the origin, allowing the slope to vary between segments and thus accommodating firms operating at different scales. BCC envelops the data more tightly, typically producing higher efficiency scores than CCR for the same dataset.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "easy", "ch": "ch2", "type": "base"}, {"id": "a0cc-Q10", "q": "You run DEA per-quarter rather than on the full time series. What is the rationale for this temporal decomposition?", "a": "Running DEA per-quarter ensures that efficiency scores reflect the evolving competitive landscape and operational performance over time. A firm may be efficient in one quarter but not in another due to seasonal factors, management changes, or macroeconomic shocks. Averaging per-quarter scores into the RFSI captures persistent efficiency rather than point-in-time performance, making the metric more robust.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "easy", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q11", "q": "How does the greedy categorization algorithm handle the risk of overfitting to training-period returns?", "a": "The algorithm optimizes input/output assignments using only training-period data (Jan 2022-Jan 2024), not the evaluation period, so it does not constitute look-ahead bias. However, the categorization could overfit to training-period market conditions. A more rigorous approach would reserve a separate validation period exclusively for categorization tuning, which is acknowledged as a limitation.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q12", "q": "What does it mean for a DMU to be on the efficiency frontier in your BCC model?", "a": "A DMU on the efficiency frontier achieves an efficiency score of 1.0, meaning no other combination of DMUs in the dataset can produce equal or greater outputs with fewer inputs. These firms define the best-practice frontier against which all other firms are benchmarked. In financial terms, frontier firms exhibit optimal operational efficiency relative to their sector peers.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "easy", "ch": "ch2", "type": "base"}, {"id": "a0cc-Q13", "q": "The thesis mentions DEA's \"translation invariance\" property. Explain what this means and why it matters.", "a": "Output translation invariance means that adding a constant to all output values does not change efficiency rankings under input-oriented BCC. This property is important because the LP formulation requires strictly positive values, so a preprocessing step adds a positive shift to any metrics with negative or zero values. Translation invariance ensures this shift doesn't distort the relative efficiency scores.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch2", "type": "base"}, {"id": "a0cc-Q14", "q": "How do you handle firms with missing financial metrics in the DEA model?", "a": "Firms with more than 10% of financial metrics missing are excluded entirely from the analysis. For remaining firms, missing values are forward-filled using the most recent available quarterly value. This ensures the DEA model operates on complete data without introducing artificial patterns from imputation methods like mean substitution, which would distort the efficiency frontier.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q15", "q": "Why does the Financials sector fail in your DEA implementation? What would be required to fix this?", "a": "The Financials sector contains heterogeneous entities—banks, insurance companies, asset managers—with fundamentally different balance sheet structures. Metrics like inventory turnover are inapplicable to banks, while insurance liabilities are structurally different from corporate debt. Addressing this requires sector-specific metric definitions: one set of inputs/outputs for banks, another for insurers, which would require separate DEA models per sub-industry.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "hard", "ch": "ch4", "type": "base"}, {"id": "a0cc-Q16", "q": "What is the search space size for the input/output categorization problem and how does the greedy algorithm explore it?", "a": "With 18 financial metrics, there are $2^{18} - 2 = 262,142$ possible categorizations (excluding degenerate cases with zero inputs or outputs). The greedy algorithm explores a single path through this space by iteratively assigning each uncategorized metric to the role (input or output) that maximizes correlation with stock returns. Alternative approaches include simulated annealing or genetic algorithms for the categorization itself.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "easy", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q17", "q": "How does sector-level filtering affect DEA efficiency scores compared to running DEA on the full S&P 500?", "a": "Sector-level filtering restricts DEA comparisons to firms with similar business models, producing efficiency scores that reflect intra-sector performance rather than cross-sector differences. A semiconductor company is evaluated against other semiconductors rather than utilities or consumer staples, whose financial ratio distributions differ fundamentally. This strengthens the discriminatory power of the RFSI by ensuring efficiency comparisons are economically meaningful.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q18", "q": "In your DEA formulation, what happens when you add more DMUs to the analysis? Does the efficiency frontier become \"easier\" or \"harder\" to reach?", "a": "Adding more DMUs typically makes the frontier harder to reach because the new firms may dominate existing ones on certain dimensions, pushing the frontier outward. This generally lowers average efficiency scores in the population. However, if new firms are uniformly inefficient, they won't affect the frontier and existing efficient DMUs retain their scores—a property known as frontier stability.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch2", "type": "base"}, {"id": "a0cc-Q19", "q": "What is the computational complexity of your DEA implementation and how does it scale with the number of firms and quarters?", "a": "The implementation solves J separate linear programs (one per firm) for each quarter Q. Each LP has J constraints and M+N variables (inputs + outputs). Using CBC solver, worst-case complexity is O(J²MN) per quarter. For a 70-firm sector with 8 quarters and 18 metrics, this requires solving 560 LPs, which completes in seconds on modern hardware but could become a bottleneck for larger universes.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "easy", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q20", "q": "The Information Technology case study shows that DEA selects mid-cap firms over mega-caps like NVIDIA. Is DEA fundamentally biased against large firms?", "a": "DEA is not biased by size per se, but it evaluates ratio-based efficiency (e.g., ROE, profit margins) rather than absolute scale. A smaller firm with lean operations and high return on equity can be more efficient than a mega-cap with lower margins, even if the mega-cap generates vastly more total profit. This is by design—DEA identifies operational efficiency, not market capitalization. The framework's underperformance in this sector reflects the disconnect between operational efficiency and momentum-driven stock returns.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch4", "type": "base"}, {"id": "a0cc-Q21", "q": "How does the BCC model's dual formulation relate to the primal problem you solved?", "a": "The primal BCC problem (used in the implementation) directly maximizes the efficiency ratio for each DMU subject to feasibility constraints. The dual formulation instead seeks the optimal linear combination of benchmark DMUs that dominates the evaluated unit, with lambdas representing peer weights. Both yield the same efficiency score; the primal is computationally simpler when the number of inputs/outputs is small relative to the number of DMUs.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "hard", "ch": "ch2", "type": "base"}, {"id": "a0cc-Q22", "q": "What happens if all firms in a sector are \"efficient\" according to DEA? How does this affect portfolio selection?", "a": "If all firms are efficient, the RFSI scores cluster at 1.0, providing minimal discrimination. This occurs in homogeneous, high-quality sectors where most firms are best-in-class on at least one dimension. In such cases, the technical scoring layer becomes the primary differentiator, and the combined score is dominated by technical signals rather than fundamental efficiency. The framework is designed to handle this through the weighted combination of RFSI and technical scores.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q23", "q": "How does outlier detection interact with the DEA model? Could removing outliers paradoxically worsen efficiency discrimination?", "a": "Outlier removal using a 5-sigma threshold targets data corruption (e.g., raw dollar values stored as ratios) rather than natural variation. A firm is excluded only if more than one metric is flagged, preserving legitimately different business models. Paradoxically, removing true outliers—firms with extreme but valid ratios—could reduce frontier diversity and compress efficiency scores. The conservative multi-metric threshold balances data quality with preserving natural variance.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q24", "q": "The categorization algorithm maximizes correlation with stock returns. Is this appropriate for a long-term investment framework?", "a": "Maximizing correlation with returns aligns the DEA inputs/outputs with market-validated performance, which is appropriate for portfolio construction. However, short-term correlations may not persist, and the optimization could favor metrics that captured idiosyncratic training-period dynamics. A more robust approach might optimize for risk-adjusted returns (Sharpe) rather than raw returns, or use a longer historical window to capture multiple market regimes. This is acknowledged as a limitation.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a0cc-Q25", "q": "Explain how your DEA implementation differs from the Edirisinghe and Zhang (2007) methodology that inspired it.", "a": "Both use 18 financial metrics and BCC input-oriented DEA with greedy categorization optimization. The key difference is temporal granularity: this implementation runs DEA per-quarter and averages efficiency scores to compute RFSI, whereas Edirisinghe computed a single efficiency score from cross-sectional data. The per-quarter approach captures evolving efficiency over time, making RFSI more robust to seasonal effects and one-time reporting anomalies. Additionally, this framework adds technical scoring and risk-aversion filtering layers not present in the original work.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q1", "q": "Why did you choose tournament selection with k=3 instead of roulette wheel selection for parent selection in your GA?", "a": "Tournament selection provides adjustable selection pressure without requiring fitness scaling, which is necessary in roulette wheel selection when fitness values are negative (Sharpe Ratios can be negative). Tournament selection is also simpler to implement and computationally cheaper than roulette wheel, which requires computing the sum of all fitness values. The choice of k=3 balances selection pressure (favoring better individuals) with diversity (allowing weaker individuals a chance).\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q2", "q": "Your arithmetic crossover uses α ~ U(0.3, 0.7) instead of the standard U(0, 1). What is the justification for this restricted range?", "a": "The restricted range prevents offspring from being nearly identical to one parent (which would happen if α ≈ 0 or α ≈ 1). By constraining α to [0.3, 0.7], we ensure that offspring inherit substantial genetic material from both parents, promoting exploration of intermediate solutions in the weight space. This is particularly important in portfolio optimization where both parents are already reasonably fit solutions.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "easy", "ch": "ch3", "type": "base"}, {"id": "a660-Q3", "q": "How does your Gaussian mutation with σ = 0.05 relate to the solution space? How did you choose this standard deviation?", "a": "With σ = 0.05, a mutation typically perturbs a weight by ±5 percentage points (e.g., 20% → 15% or 25%). This is small enough to perform local search around good solutions without disrupting them catastrophically, yet large enough to escape local optima. The value follows standard practice in portfolio optimization GAs, where mutation is meant to introduce small perturbations rather than large jumps, since the repair operator re-normalizes weights afterward.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch2", "type": "base"}, {"id": "a660-Q4", "q": "Your mutation rate is 0.1, which is relatively high. Why not use a lower rate like 0.01 as is common in binary-encoded GAs?", "a": "Binary-encoded GAs use lower mutation rates because each chromosome has many bits, so even 0.01 per-bit results in multiple mutations per individual. Our real-valued chromosome has only N genes (asset weights), so a 0.1 rate means each asset weight has a 10% chance of mutation. This is necessary to maintain sufficient genetic diversity in continuous optimization problems, where premature convergence is a greater risk than in discrete problems.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q5", "q": "You preserve 10 elite individuals across generations. How did you determine this elitism size relative to your population of 100?", "a": "An elitism size of 10% (10 out of 100) is a standard guideline that balances preservation of good solutions with allowing evolutionary pressure to improve the population. Smaller elitism (e.g., 1-2) risks losing good solutions through stochastic variation, while larger elitism (e.g., 30+) reduces selection pressure and slows convergence. The 10% rule has empirical support in the GA literature for continuous optimization problems.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch2", "type": "base"}, {"id": "a660-Q6", "q": "Your fitness function includes a diversity penalty λ · κ · (HHI(w) - 1/N). Why subtract 1/N from the HHI?", "a": "Subtracting 1/N (the HHI of an equal-weight portfolio) centers the penalty at zero for uniform diversification. Without this baseline, even a perfectly diversified portfolio would incur a penalty. This design means the penalty term is zero for equal weights and increases as concentration grows. It provides a natural reference point: the GA is penalized for concentration above the equal-weight baseline but not rewarded for spreading weights evenly.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q7", "q": "Why do you use different scaling constants κ for Sharpe (κ=5) and Total Return (κ=2) fitness functions?", "a": "The scaling constant κ calibrates the diversity penalty to match the typical magnitude of the primary objective. Sharpe Ratios typically range from -1 to 3, while total returns can range from -50% to +200%. Without scaling, a fixed λ=0.2 would have disproportionate impact: too strong for total return (overwhelming the primary objective) and too weak for Sharpe. The different κ values ensure the penalty has comparable relative influence across fitness functions.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q8", "q": "Your GA converges in 19 generations for Communication Services but 56 for Information Technology. What explains this difference?", "a": "The larger solution space for Information Technology (15 assets passing the filter vs. 8 for Communication Services) creates a more complex optimization landscape with more local optima. Additionally, if the IT portfolio has higher inter-asset correlation or more similar Sharpe ratios among candidates, the fitness landscape may be flatter, requiring more generations for the tournament selection to differentiate and propagate superior solutions.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch4", "type": "base"}, {"id": "a660-Q9", "q": "How does your repair operator handle the case where normalization after clipping violates the maximum position constraint?", "a": "The repair operator applies operations in sequence: (1) clip negatives to zero, (2) clip excess weights to w_max=30%, (3) normalize to sum to 1. If clipping multiple weights to 30% causes their sum to exceed 1.0, the normalization step proportionally reduces all weights, which may bring previously-clipped weights below 30%. This conditional normalization ensures feasibility, though it can introduce oscillation. The code implements this as written in Algorithm 3.1 (lines 502-503).\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q10", "q": "Why initialize the population with Dirichlet-distributed weights instead of uniform random weights?", "a": "The Dirichlet distribution (Dir(α, ..., α)) naturally generates weight vectors that sum to 1, satisfying the budget constraint by construction. For α=1 (uniform Dirichlet), this is equivalent to uniformly sampling the probability simplex. Random uniform weights would require normalization, which can introduce bias. Dirichlet initialization provides diverse starting points while respecting the constraint structure, giving the GA a strong foundation for exploration.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q11", "q": "Your convergence threshold is 10^-4 for best fitness improvement. How many consecutive generations must satisfy this before the GA terminates early?", "a": "The thesis specifies a convergence threshold of 10^-4 but does not explicitly state the patience parameter (number of consecutive stagnant generations required for early stopping). Standard practice would be 10-20 generations, but the implementation details in Section 3.5 indicate the GA runs for a maximum of 200 generations. The convergence threshold likely serves as a stopping criterion only if fitness improvement drops below 0.0001 for several consecutive generations, though the exact implementation is not fully specified.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch4", "type": "base"}, {"id": "a660-Q12", "q": "Why don't you use multi-objective optimization (e.g., NSGA-II) to handle risk and return simultaneously instead of combining them in a single fitness function?", "a": "A single fitness function (Sharpe Ratio or Total Return with diversity penalty) provides an explicit trade-off controlled by λ, making the solution interpretable and parameter-tuning straightforward. Multi-objective approaches like NSGA-II produce a Pareto front of solutions, requiring the investor to select a preferred trade-off post-optimization. For practitioners, having a single optimal portfolio per parameter configuration is more actionable. However, NSGA-II would be valuable for exploring the risk-return frontier, which is discussed as future work.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q13", "q": "Your GA uses a generational model with elitism. Why not use a steady-state GA where only a few individuals are replaced per iteration?", "a": "Generational models with elitism are simpler to implement and provide clearer convergence behavior, making them easier to analyze and debug. Steady-state GAs can converge faster by immediately propagating good solutions, but they risk premature convergence if selection pressure is too high. For portfolio optimization, where evaluation is computationally cheap (no expensive simulations), the generational model's per-generation overhead is negligible, and the elitism mechanism already preserves the best solutions.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q14", "q": "How does the position limit constraint (30% max per asset) interact with the diversity penalty? Are they redundant?", "a": "They serve complementary purposes. The hard constraint (30% max) prevents extreme concentration in a single asset for regulatory or risk-management reasons. The diversity penalty provides a soft incentive to spread allocations more evenly across multiple assets beyond the minimum required by the constraint. Without the penalty, the GA could allocate 30% + 30% + 30% + 10% (4 assets), which satisfies the constraint but is still concentrated. The penalty encourages broader diversification.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q15", "q": "Your chromosome representation is a real-valued vector of weights. Did you consider alternative encodings, such as binary or rank-based representations?", "a": "Real-valued encoding is the natural choice for continuous portfolio weights, as it directly represents the solution space without requiring decoding. Binary encoding would require additional precision bits and decoding logic, complicating crossover and mutation operators. Rank-based encoding (where chromosomes specify asset ordering and a separate function determines weights) would decouple selection from allocation, but our problem requires simultaneously optimizing both which assets to hold and their weights, making direct weight encoding more appropriate.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch2", "type": "base"}, {"id": "a660-Q16", "q": "You report a Sharpe Ratio standard deviation of 0.007 across 10 GA runs. Is this low variance due to the problem structure or the GA design?", "a": "It is primarily due to the GA design. The elitism mechanism (10 individuals) ensures the best solutions are never lost, and the convergence threshold stops the algorithm when improvement stagnates. Additionally, the constrained solution space (weights sum to 1, max 30% per asset) limits the number of distinct high-quality solutions. The problem structure—a convex fitness landscape dominated by a few high-Sharpe assets—also contributes, as different runs converge to similar allocations.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "hard", "ch": "ch3", "type": "base"}, {"id": "a660-Q17", "q": "Why use crossover rate 0.7 instead of applying crossover to every pair of parents (rate 1.0)?", "a": "A crossover rate of 0.7 means 30% of offspring are exact copies of parents (no recombination), preserving good solutions unchanged through reproduction. This provides a balance: crossover explores new combinations (exploitation of parent structure), while direct copying preserves diversity (some parents survive intact). A rate of 1.0 would apply crossover universally, potentially disrupting all good solutions before they can propagate through selection.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q18", "q": "Your fitness evaluation uses historical returns from a 2-year training window. How does this window size affect GA convergence and solution quality?", "a": "A longer training window (2 years) provides more return observations, reducing estimation error in mean returns and covariance, which stabilizes fitness evaluation. However, it also increases computational cost per generation and may average out regime-specific patterns. The 2-year window was chosen as a compromise: long enough to smooth noise but short enough to reflect recent market conditions. The sensitivity of GA solutions to window size is not explicitly tested but would be valuable future work.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q19", "q": "How does your GA handle the minimum-assets constraint (at least 3 non-zero weights)? Could this interfere with natural convergence?", "a": "The repair operator (Algorithm 3.1, lines 504-507) enforces the minimum-assets constraint by randomly activating zero-weight positions until at least 3 are non-zero, then re-normalizing. This can interfere with convergence if the optimal unconstrained solution has fewer than 3 assets, forcing the GA to allocate capital to suboptimal holdings. However, for risk-adjusted objectives like Sharpe Ratio, portfolios with at least 3 assets are typically superior due to diversification benefits, so the constraint aligns with the objective in practice.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q20", "q": "You terminate the GA at 200 generations. How did you determine this limit, and is there evidence the algorithm has converged by then?", "a": "The 200-generation limit follows standard practice in portfolio optimization GAs (Chang et al., 2000). Empirical evidence from the case studies shows convergence occurs much earlier: 19 generations for Communication Services and 56 for Information Technology. The fitness evolution curves (Figure 3.8) show plateaus well before generation 200, indicating that the limit is conservative. The early stopping criterion (fitness improvement < 10^-4) typically triggers before the limit is reached.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch4", "type": "base"}, {"id": "a660-Q21", "q": "Your population size is 100. How does this scale with the number of assets N being optimized? Is 100 sufficient for N=15 (Information Technology)?", "a": "A common heuristic is that population size should be 5-10 times the chromosome length. For N=15 assets (15 genes), a population of 100 is 6.7× the problem dimension, which is adequate. For smaller problems (N=5-8), the population may be oversized, while for larger problems (N>20), it may be undersized. The 100-individual population was chosen as a general-purpose default that works across the range of N encountered (5-15 assets), balancing exploration capacity with computational cost.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q22", "q": "Could you apply adaptive parameter control (e.g., decreasing mutation rate over time) to improve convergence? Why or why not?", "a": "Adaptive parameter control—such as starting with high mutation rates (exploration) and decreasing them as the GA converges (exploitation)—could improve performance. This is a well-studied approach in evolutionary computation. However, the current fixed parameters (mutation rate 0.1, crossover rate 0.7) already produce consistent convergence (std 0.007), suggesting that adaptive control may offer marginal improvement at the cost of additional complexity. Adaptive strategies would be valuable future work, especially for larger-scale problems or different fitness landscapes.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q23", "q": "How does the Herfindahl-Hirschman Index (HHI) in your diversity penalty compare to alternative diversity measures like entropy or Gini coefficient?", "a": "HHI (sum of squared weights) is computationally simple, differentiable (important for gradient-based analysis), and widely used in finance to measure concentration. Entropy-based diversity measures would penalize concentration more strongly at the extremes but are more complex to compute. The Gini coefficient measures inequality across the full distribution. HHI was chosen because it is the standard measure in portfolio concentration analysis and integrates naturally into the fitness function as a smooth penalty term.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q24", "q": "Your GA optimizes for in-sample Sharpe Ratio. How do you prevent overfitting to the training period?", "a": "Several mechanisms prevent overfitting: (1) the temporal train/test split ensures the GA never sees evaluation-period data, (2) the diversity penalty discourages over-concentration in a single high-past-return asset, (3) the position limit (30% max) enforces diversification, and (4) the constraint that at least 3 assets must have non-zero weights. Additionally, the two-year training window (2022-2024) is long enough to average out short-term noise. The out-of-sample performance (53.28% return, Sharpe 1.10 for Communication Services) suggests limited overfitting.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a660-Q25", "q": "Why use a single-population GA instead of island models or cooperative co-evolution?", "a": "A single-population GA is simpler to implement and sufficient for the problem scale (N ≤ 15 assets, relatively smooth fitness landscape). Island models (multiple subpopulations with migration) are beneficial for very large or multimodal problems where maintaining multiple exploration fronts is necessary. Cooperative co-evolution (decomposing the problem into subcomponents) would not naturally apply here, as portfolio weight allocation is inherently holistic—each weight depends on all others through covariance. The single-population design meets the research objectives while remaining interpretable.\n\n---", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q1", "q": "Why did you choose a fixed risk-free rate of 2% for the entire evaluation period when short-term Treasury yields exceeded 4% in 2023? How does this affect the Sharpe Ratio comparisons?", "a": "A fixed 2% approximates the long-term post-2008 average U.S. Treasury yield, ensuring consistency across different backtest periods. While 2023 yields were higher, using a constant rate ensures that relative comparisons between portfolio and benchmark remain valid, as both use the same risk-free rate. The absolute Sharpe values would increase with a higher rate, but the ranking between strategies would remain unchanged.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q2", "q": "Your Information Technology portfolio achieved a Sharpe Ratio of 0.653 compared to SPY's 1.205. Given this underperformance, under what conditions would you recommend deploying this strategy to a client?", "a": "The IT portfolio underperformed because DEA selected fundamentally efficient mid-caps (Teledyne, Cisco, Trimble) over momentum-driven mega-caps (NVIDIA, Apple). This strategy would be appropriate for investors with high conviction in mean reversion or those seeking exposure to operationally efficient mid-caps while avoiding concentrated mega-cap risk. The framework's value in IT is not absolute outperformance but diversification away from the Magnificent Seven concentration.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q3", "q": "You compute technical indicators at a single point in time (the portfolio construction date). How does this avoid look-ahead bias, and what information would a real investor have had at that exact moment?", "a": "Technical scores are computed using only price data available up to (and including) the analysis date, simulating the information set a real investor would have had at decision time. The indicators (BB, RSI, EMA, MACD) use historical price windows (20, 14, 50 days, respectively) that precede the construction date. This ensures no future price information contaminates the signal, maintaining strict temporal separation between training and evaluation.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q4", "q": "The Sortino Ratio for your Communication Services portfolio (1.569) exceeds SPY's (1.533), while the Sharpe Ratio is lower (1.101 vs 1.205). What does this tell us about the portfolio's return distribution?", "a": "The higher Sortino Ratio indicates that when considering only downside risk (returns below the target threshold), the portfolio performs better than SPY. This suggests the portfolio's excess volatility is asymmetric—driven more by upside movements than downside losses. The portfolio has a more favorable risk profile for loss-averse investors who care primarily about minimizing drawdowns rather than total volatility.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "easy", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q5", "q": "Your conservative risk aversion portfolio (α=0.2) achieved 81.23% return with -24.11% maximum drawdown. How would you explain this trade-off to a retail investor with limited risk tolerance?", "a": "The conservative filter concentrates capital in the six highest-scoring assets, which amplifies both returns and drawdowns. While the 81.23% return is exceptional, the -24.11% maximum drawdown means the investor would have experienced a quarter of their portfolio value erased at the worst point. Retail investors with limited risk tolerance should understand that \"conservative\" refers to selective asset filtering, not low volatility—the resulting concentrated portfolio carries substantial drawdown risk.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q6", "q": "You use a 2-year training period (2022-2024) for GA optimization and a 2-year backtest period (2024-2026). The training Sharpe Ratio is 0.367 while the backtest Sharpe is 1.101. Is this evidence of overfitting?", "a": "No, this is not overfitting—it reflects different market regimes. The 2022-2024 training window includes the 2022 bear market, which depressed returns and increased volatility, yielding a low Sharpe. The 2024-2026 backtest window captures the subsequent bull market recovery, producing higher risk-adjusted returns. The GA never sees the backtest data during optimization, so the improvement reflects regime change rather than in-sample optimization.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q7", "q": "Walk me through how you prevent look-ahead bias in your DEA categorization algorithm, which optimizes input/output assignment based on correlation with stock returns.", "a": "The categorization uses per-quarter DEA scores correlated with stock returns from the training period (2022-2024) only. The algorithm optimizes which financial metrics are inputs vs outputs to maximize this correlation, but crucially, the backtest period (2024-2026) data is never used. While this is in-sample optimization within the training window, it does not constitute look-ahead bias because the evaluation data remains unseen.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q8", "q": "Your transaction cost model assumes a flat 0.1% per trade. How would realistic market impact and bid-ask spreads for mid-cap stocks like Trimble or Teledyne affect your results?", "a": "Real-world costs for mid-cap stocks could be substantially higher than 0.1%—bid-ask spreads of 0.2-0.5% plus market impact for large orders could easily double or triple effective transaction costs. Since the framework is buy-and-hold without rebalancing, costs only apply at portfolio construction. However, for strategies with frequent rebalancing or small positions, realistic costs could erode 2-5% annually, potentially eliminating the observed outperformance in portfolios like Communication Services.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q9", "q": "Why does the RSI scoring function saturate at 70 (score=1.0) rather than continuing to increase? Doesn't this lose information about extremely overbought conditions?", "a": "The saturation reflects standard RSI interpretation: values above 70 indicate overbought conditions, typically bearish signals. However, in strong trending markets, RSI can remain overbought for extended periods. The monotonic scoring used here treats higher RSI as uniformly bullish, which is appropriate for momentum strategies. The saturation at 1.0 ensures the score remains bounded in [0,1] for combination with other indicators, though it does discard granularity above 70.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q10", "q": "Your MACD and EMA indicators produce binary scores (0 or 1). Doesn't this reduce differentiation among assets compared to continuous indicators like Bollinger Bands?", "a": "Yes, binary indicators provide less differentiation—assets are simply classified as \"above EMA\" or \"below.\" This is consistent with their function as trend confirmation signals rather than continuous momentum measures. The composite score blends two continuous indicators (BB, RSI) with two binary signals (EMA, MACD), balancing granularity with interpretability. A sensitivity analysis on indicator weighting could reveal whether overweighting continuous indicators improves performance.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q11", "q": "You report a win rate of 57.3% for Communication Services vs 58.1% for SPY. What does this metric tell us that Sharpe Ratio does not?", "a": "Win rate measures the proportion of positive-return days, indicating consistency rather than magnitude. The portfolio's slightly lower win rate (57.3% vs 58.1%) but higher total return means it achieves gains through larger positive movements rather than more frequent small gains. This suggests a positively skewed return distribution. However, win rate ignores magnitude entirely, making it a poor standalone metric—it's possible to have 90% win rate but still lose money if the 10% losing days are catastrophic.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "easy", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q12", "q": "Maximum drawdown is -22.69% for Communication Services vs -18.76% for SPY. In a client meeting, how would you justify the deeper drawdown?", "a": "The deeper drawdown is the trade-off for sector concentration and mid-cap exposure. The portfolio delivered 53.28% total return vs SPY's 47.84%—5.44 percentage points of outperformance. For investors seeking higher absolute returns and willing to accept larger temporary losses, this is a favorable trade-off. The key is ensuring the client's liquidity needs and psychological tolerance align with potentially experiencing a 22-23% peak-to-trough decline.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "hard", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q13", "q": "Why use Bessel's correction (N-1 denominator) for volatility calculation? How does this affect Sharpe Ratio comparisons between portfolios with different holding periods?", "a": "Bessel's correction provides an unbiased estimate of population variance from a finite sample, correcting for the fact that sample variance underestimates true variance. For a 2-year backtest (~500 trading days), the correction factor is minimal (500 vs 499), but it ensures statistical rigor. Since both portfolio and benchmark use the same correction and the same time period (N is constant), Sharpe Ratio comparisons remain valid.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q14", "q": "You annualize volatility by multiplying daily variance by 252. This assumes i.i.d. returns. How does serial correlation or time-varying volatility affect this calculation?", "a": "The 252-scaling assumes returns are uncorrelated across days, which is violated in practice due to momentum, volatility clustering, and mean reversion. For portfolios with positive serial correlation, this understates true annualized volatility; for mean-reverting portfolios, it overstates it. The block bootstrap (block size=5) partially addresses this by preserving short-term serial dependence when constructing confidence intervals, but the point estimates still rely on the i.i.d. scaling assumption.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q15", "q": "Your bootstrap confidence interval for Sharpe Ratio is [-0.28, 2.90]. The lower bound includes zero. How do you interpret this for portfolio adoption?", "a": "The wide CI reflects substantial estimation uncertainty even over two years—financial returns are highly variable. The point estimate (1.101) is well above zero and comparable to SPY (1.205), but the CI acknowledges that under different resampled histories, Sharpe could have been negative. This does not invalidate the strategy, but it underscores that two years is barely sufficient for reliable inference. The cross-sector analysis provides additional independent evidence across 10 sectors.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q16", "q": "Why compare all sector portfolios to the broad S&P 500 (SPY) instead of sector-specific ETFs like XLC or XLK?", "a": "Using SPY is a conservative benchmark choice—it tests whether sector-focused portfolios can beat a diversified index despite lacking cross-sector diversification. Sector-specific ETFs would isolate stock-selection alpha from sector beta, revealing whether outperformance stems from intra-sector stock picking or sector tailwinds. This is a acknowledged limitation; future work should use sector benchmarks to decompose these effects.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q17", "q": "The Calmar Ratio (return/max drawdown) for Communication Services is 1.056 vs SPY's 1.159. Given that you outperformed on total return, why is Calmar lower?", "a": "Calmar Ratio divides annualized return by maximum drawdown. Communication Services achieved 23.96% annual return vs SPY's 21.73% (9.3% higher), but its drawdown was -22.69% vs -18.76% (21% deeper). The denominator effect dominates—the proportional increase in drawdown exceeds the proportional increase in return, yielding a lower Calmar. This metric penalizes drawdown more heavily than Sharpe Ratio, making it stricter for concentrated portfolios.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q18", "q": "You use a 30-day cache for API data. How does this affect reproducibility if financial statements are restated or price data is adjusted for splits?", "a": "The 30-day cache improves efficiency but introduces staleness risk. If a company restates quarterly earnings during the 30-day window, the cached data would be outdated. Similarly, corporate actions (splits, dividends) trigger price adjustments, but yfinance's adjusted prices should handle this. For reproducibility, the cache should be versioned and timestamped. Critical production implementations should use a shorter cache (1 day) or event-driven invalidation on corporate actions.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q19", "q": "Your Financials sector failed due to \"dimensionality mismatch.\" What specifically causes this, and how would you fix it?", "a": "Financials failed because banks, insurers, and asset managers have fundamentally different balance sheet structures—banks report \"loans\" and \"deposits,\" insurers report \"policy reserves,\" asset managers report \"AUM.\" Applying standardized financial ratios (like inventory turnover or current ratio) to this heterogeneous group yields excessive missing values. The fix requires sector-specific metric definitions: for banks, use Tier 1 capital ratio and loan loss reserves; for insurers, use combined ratio and loss reserves; for asset managers, use AUM growth and management fees.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "hard", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q20", "q": "The DEA BCC model constrains efficiency scores to [0,1], yet you mention clamping to correct floating-point artifacts. Under what conditions does the LP solver produce values outside this range?", "a": "The BCC model mathematically constrains efficiency scores to [0,1] via the convexity constraint (Σλ=1) and normalization. However, floating-point arithmetic in the LP solver (PULP CBC) can produce artifacts like 1.0000001 or -0.0000003 due to numerical precision limits. The clamping step (clip to [0,1]) corrects these artifacts without affecting economically meaningful scores. This is standard practice in LP implementations to ensure strict feasibility post-solve.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q21", "q": "You report that the GA converges in 19 generations for Communication Services but 56 for Information Technology. What drives this difference?", "a": "Convergence speed depends on solution space complexity. Communication Services has 10 filtered assets, yielding a 10-dimensional weight-space simplex; Information Technology has 15 assets (15 dimensions). The larger space requires more generations for the GA to explore. Additionally, if the IT fitness landscape has more local optima (due to higher asset correlation), tournament selection and mutation take longer to find the global optimum. The elitism mechanism (top 10 preserved) ensures that longer convergence doesn't lose good solutions.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q22", "q": "Your diversity penalty uses HHI (Σw²) minus 1/N. Why subtract the equal-weight baseline rather than penalize raw concentration?", "a": "Subtracting 1/N centers the penalty at zero for an equal-weight portfolio, ensuring the GA only penalizes concentrations that exceed naive diversification. Raw HHI would penalize even moderately diversified portfolios, pushing the GA toward implausibly uniform allocations. The baseline subtraction allows the GA to concentrate capital when justified by Sharpe maximization while penalizing extreme concentration (e.g., 100% in one asset). The λ=0.2 coefficient calibrates the penalty magnitude.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q23", "q": "Is a 2-year backtest sufficient to draw conclusions about a strategy's viability? What market regimes are missing from your evaluation window?", "a": "Two years is barely sufficient—it captures the 2024 bull market and early-2025 corrections, but misses fundamentally different regimes like the 2008 financial crisis, COVID-19 crash, or prolonged bear markets. The framework's reliance on technical momentum may fail in sideways or rapidly mean-reverting markets. A rolling-window evaluation across multiple non-overlapping 2-year periods (e.g., 2010-2012, 2012-2014, ..., 2024-2026) would provide stronger evidence of robustness across regimes.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q24", "q": "How would you adapt this framework for real-world deployment with daily rebalancing? What computational and cost constraints would dominate?", "a": "Daily rebalancing would require: (1) updating technical indicators daily (computationally trivial), (2) re-running the GA daily (expensive—200 generations × 100 population × fitness evaluation per portfolio), and (3) incurring transaction costs on every weight adjustment (potentially 1-2% annual drag). The GA runtime would dominate—parallelizing fitness evaluation across CPU cores is essential. Realistically, weekly or monthly rebalancing is more practical, balancing adaptivity against costs. Alternatively, replace the GA with a faster quadratic programming solver if constraints permit.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a8d6-Q25", "q": "Your thesis claims this framework is \"industry-aware.\" How does restricting DEA to a single GICS sector improve efficiency discrimination compared to cross-sector DEA?", "a": "Single-sector DEA compares firms with similar business models and capital structures—semiconductor companies against other semiconductor companies, not against utilities or banks. This homogeneity strengthens discrimination because efficiency scores reflect intra-sector performance rather than structural cross-sector differences (e.g., utilities are inherently capital-intensive with low ROE). Cross-sector DEA would rank utilities as \"inefficient\" simply due to industry characteristics, not managerial quality. Sector-scoped DEA produces economically meaningful efficiency rankings that isolate operational performance from industry structure.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a98a-Q1", "q": "What are the three main research questions this thesis addresses, and how do the case studies map to answering them?", "a": "RQ1 asks if DEA-based efficiency scores identify outperforming stocks; RQ2 asks if integrating technical analysis with fundamental scores improves selection; and RQ3 asks how GA-optimized portfolios compare to the S&P 500 benchmark. The Communication Services case study provides evidence for RQ1 and RQ3, showing outperformance (53.28% vs 47.84%). The Information Technology case study demonstrates that DEA selects operationally efficient mid-caps rather than momentum-driven mega-caps, answering RQ1's nuances. Case Study 3 directly addresses RQ4 (impact of risk aversion parameter) by comparing conservative, moderate, and aggressive configurations.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch1", "type": "base"}, {"id": "a98a-Q2", "q": "How does the framework address the in-sample bias problem, and what temporal separation exists between training and evaluation?", "a": "The framework implements a strict temporal split between training (Jan 2022–Jan 2024) and evaluation (Jan 2024–Jan 2026). The GA optimizes weights on the training window, and performance is evaluated on an out-of-sample backtest that the optimization never sees. Technical indicators are computed strictly at the analysis date using only information available at decision time. The DEA categorization uses per-quarter efficiency scores on the training period, avoiding look-ahead bias, though the categorization itself is in-sample optimized.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch4", "type": "base"}, {"id": "a98a-Q3", "q": "Why was the BCC (Variable Returns to Scale) model chosen over the CCR model for DEA, and what are the implications?", "a": "The BCC model was chosen because S&P 500 constituents span wide operational scales from mid-cap to trillion-dollar enterprises. The CCR model's constant returns to scale assumption would incorrectly penalize firms operating at non-optimal scales. The BCC model's convexity constraint (sum of lambda = 1) accounts for scale differences, providing more realistic efficiency assessments. Additionally, BCC possesses output translation invariance, ensuring efficiency rankings are preserved when output values are shifted by constants, which is critical given the preprocessing step.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch2", "type": "base"}, {"id": "a98a-Q4", "q": "What is the key architectural decision that distinguishes this framework from traditional portfolio optimization approaches?", "a": "The framework treats asset selection and portfolio optimization as interdependent phases of a unified pipeline rather than separate problems. Traditional approaches assume the investable asset set is predetermined and optimize weights over that set. This framework uses DEA to systematically filter the universe to fundamentally efficient firms, then applies technical scoring to refine timing, and only then passes the filtered candidates to the GA for weight optimization. This two-stage design ensures asset quality fundamentally constrains what optimization can achieve.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "easy", "ch": "ch3", "type": "base"}, {"id": "a98a-Q5", "q": "The framework is described as \"industry-aware.\" What does this mean and why is it important for DEA analysis?", "a": "The pipeline allows investors to scope the entire analysis to specific GICS sectors or sub-industries. When restricted to a single sector, DEA compares firms against peers with similar business models and capital structures, producing efficiency scores that reflect intra-sector performance. This sector-homogeneous comparison strengthens the discriminatory power of RFSI by avoiding meaningless cross-sector comparisons (e.g., semiconductor companies vs. utilities). The industry filter is applied before data collection, making the framework practical for sector-focused investment strategies.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch3", "type": "base"}, {"id": "a98a-Q6", "q": "What is the greedy categorization algorithm used for input/output assignment in DEA, and what are its limitations?", "a": "The greedy algorithm iteratively assigns each financial metric as an input or output by testing which categorization maximizes correlation with stock returns. It explores a single path through 2^18 - 2 = 262,142 possible categorizations, starting from a theory-informed default. The main limitation is that it uses training-period stock returns to optimize categorization, which could overfit to training conditions. Alternative approaches like simulated annealing or exhaustive search were not feasible due to computational cost—each evaluation requires solving J × Q linear programs (firms × quarters).", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch5", "type": "base"}, {"id": "a98a-Q7", "q": "How does the framework ensure that technical indicators do not introduce look-ahead bias?", "a": "Technical scores are calculated only at the analysis date (portfolio construction date) using only price data available up to that date. The framework evaluates each indicator's value on a single day—when the investor would construct the portfolio—rather than averaging scores over the backtest period, which would use future price data. This point-in-time calculation simulates the information set a real investor would have had at decision time.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch4", "type": "base"}, {"id": "a98a-Q8", "q": "What is the diversity penalty in the fitness function, and why is it necessary?", "a": "The diversity penalty uses the Herfindahl-Hirschman Index (HHI) to penalize concentration: F = Sharpe - λ * κ * (HHI(w) - 1/N). Without this penalty, the GA tends to allocate all capital to the single highest-Sharpe asset, producing a degenerate one-stock portfolio. The penalty provides a smooth incentive for the GA to spread allocations. The scaling constant κ (5 for Sharpe, 2 for Total Return) calibrates the penalty magnitude to the typical range of the primary objective.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch3", "type": "base"}, {"id": "a98a-Q9", "q": "The Information Technology portfolio underperformed SPY significantly. What does this reveal about DEA's limitations?", "a": "DEA evaluates relative efficiency based on financial ratios (ROE, profit margins, leverage), not market capitalization or absolute revenue. In Information Technology, DEA selected mid-cap companies (Teledyne, Trimble, Cisco) with strong profitability metrics relative to their capital structure, missing mega-caps like NVIDIA and Apple that drove the 2024-2025 rally. This reveals a fundamental trade-off: DEA identifies operationally efficient firms, but operational efficiency does not guarantee stock price appreciation in momentum-driven markets where sentiment favors high-profile mega-caps.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch5", "type": "base"}, {"id": "a98a-Q10", "q": "What is the evidence for statistical significance of the results?", "a": "Two complementary methods were used: (1) Multi-run GA analysis with K=10 independent runs showed consistent convergence (Sharpe std = 0.007, return std = 0.5%), confirming the stochastic optimizer produces reliable solutions. (2) Block bootstrap with B=1,000 resamples (block size = 5 days) constructed 95% confidence intervals: Sharpe CI = [-0.28, 2.90], centered on the point estimate of 1.101. While the CI includes zero at the lower bound, the point estimate is well within the positive range, and the two-year window narrowed intervals compared to single-year backtests.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "easy", "ch": "ch4", "type": "base"}, {"id": "a98a-Q11", "q": "Why did the Financials sector fail, and what does this indicate about the framework's applicability?", "a": "Financials failed due to a dimensionality mismatch in the DEA model caused by heterogeneous balance sheet structures across banks, insurance companies, and asset managers. These institutions have fundamentally different financial ratio distributions, leading to excessive missing values in standardized metrics. This failure indicates that the framework works best in homogeneous sectors where firms share comparable business models. Addressing this requires sector-specific metric definitions or separate DEA models for each financial sub-industry.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch2", "type": "base"}, {"id": "a98a-Q12", "q": "What is the difference between the \"combined score\" used for filtering and the \"portfolio weight\" determined by the GA?", "a": "The combined score (RFSI + technical) determines which stocks pass the filter and enter the optimization phase. The portfolio weight is determined by the GA based on historical return and volatility characteristics, optimizing portfolio-level Sharpe Ratio. A stock can have a high combined score but low weight if it exhibits high individual volatility or poor correlation structure. For example, Meta has a high score but receives only 8.9% weight, while Omnicom receives 27.2% due to its stable returns and low correlation with other holdings.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "easy", "ch": "ch3", "type": "base"}, {"id": "a98a-Q13", "q": "How many financial metrics are extracted from the financial statements, and how were they selected?", "a": "Eighteen financial metrics are extracted, spanning six dimensions: profitability (ROE, ROA, Net Profit Margin, EPS), asset utilization (receivables/inventory/asset turnover), liquidity (current ratio, quick ratio, debt-to-equity), leverage (leverage ratio, solvency ratios), valuation (P/E, price-to-book), and growth (revenue/net income/EPS growth rates). This set follows Edirisinghe and Zhang (2007), who identified these 18 metrics as providing comprehensive coverage of a firm's financial profile for DEA analysis. The breadth ensures DEA captures multiple facets of performance rather than optimizing along a single dimension.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a98a-Q14", "q": "What are the main threats to validity in the experimental evaluation?", "a": "(1) Survivorship bias: the analysis uses current S&P 500 constituents, excluding delisted companies. (2) Single temporal window: the two-year backtest (2024-2026) captures both bull and correction, but performance across different regimes (2008 crisis, COVID-19) may differ. (3) Benchmark choice: using broad SPY rather than sector-specific ETFs doesn't isolate stock-selection skill from sector tailwinds. (4) Simplified transaction costs: flat 0.1% doesn't capture bid-ask spreads or market impact. (5) No rebalancing: single-period optimization doesn't adapt to regime shifts.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch4", "type": "base"}, {"id": "a98a-Q15", "q": "The conservative risk aversion configuration (α = 0.2) achieved 81.23% return vs 53.28% for moderate. Why is this terminology potentially misleading?", "a": "\"Conservative\" refers to conservative selection—the filter is strict, retaining only assets with the highest combined scores (top 6 vs. 10). This does not mean the resulting portfolio is low-risk; concentrating capital in fewer assets increases both upside potential and drawdown risk (max drawdown -24.11% vs -22.69%). The term describes the investor's confidence threshold for inclusion, not the portfolio's volatility profile. A more accurate framing would be \"selective\" vs. \"inclusive\" filtering.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a98a-Q16", "q": "What is the repair operator in the GA, and why is it necessary?", "a": "The repair operator (Algorithm 3.2 in Chapter 3) enforces constraint satisfaction after each genetic operation. It clips negative weights to zero, caps weights at the 30% maximum, re-normalizes so weights sum to 1, and ensures at least 3 non-zero weights by randomly increasing zero-weights if needed. This is necessary because crossover and mutation can produce infeasible chromosomes (weights < 0, sum ≠ 1, concentrated in too few assets). The repair function restores feasibility while minimizing distortion to the evolved solution.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch3", "type": "base"}, {"id": "a98a-Q17", "q": "How does the framework handle missing data in financial statements?", "a": "Missing values are handled in two stages: (1) Companies with more than 10% of their financial metrics missing are excluded entirely from the analysis. (2) Remaining gaps are forward-filled using the most recent available quarterly value (e.g., a missing Q3 metric is filled with the Q2 value for the same company). This approach balances data completeness with sample size—excluding companies with excessive missingness prevents unreliable DEA scores, while forward-filling addresses occasional reporting delays without introducing look-ahead bias.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a98a-Q18", "q": "What is the outlier detection method, and why was the 5-sigma threshold chosen over more aggressive alternatives?", "a": "Outlier detection uses a 5-standard-deviation z-score threshold: |x - μ| > 5σ. Financial ratio distributions exhibit heavy tails (e.g., debt-to-equity can legitimately range from 0 to 10+), making the conventional 3-sigma threshold too aggressive. The 5-sigma threshold was chosen to detect data corruption (e.g., raw dollar values mistakenly stored as ratios) rather than trim natural variation. Additionally, a company is only excluded if more than one metric is flagged, reducing false positives from legitimately different business models.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch2", "type": "base"}, {"id": "a98a-Q19", "q": "The framework uses equal weighting (α = 0.5) for combining RFSI and technical scores. What is the justification, and what are the limitations?", "a": "The default equal weighting represents an agnostic prior that assigns equal importance to long-term fundamental efficiency and short-term market signals, following the principle of maximum entropy when no prior information about relative predictive power is available. The limitation is that this parameter space was not systematically explored—EMA and MACD produce binary signals while BB and RSI produce continuous scores, suggesting configurations with higher weight on continuous indicators may yield better discrimination. A grid search or Bayesian optimization over the weight simplex would be the natural next step.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch5", "type": "base"}, {"id": "a98a-Q20", "q": "What is the most significant finding regarding cross-sector performance, and what does it reveal about DEA's discriminatory power?", "a": "Of 10 sectors evaluated, only Communication Services (53.28%) and Utilities (52.53%) outperformed SPY's 47.84% total return. No sector achieved a higher Sharpe Ratio than SPY's 1.20. The cross-sector average (21.91% return, 0.37 Sharpe) falls well below the benchmark. This reveals that DEA discrimination quality depends more on sector homogeneity than universe size—Communication Services (22 assets) outperformed Information Technology (69 assets). The framework works best where firms share comparable revenue models and capital structures, enabling meaningful efficiency differentiation.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "easy", "ch": "ch2", "type": "base"}, {"id": "a98a-Q21", "q": "How could the framework be extended to handle multiple time periods with rebalancing?", "a": "Multi-period optimization with rebalancing would allow the portfolio to adapt to changing market conditions and capture regime shifts. This requires: (1) periodically re-running the entire pipeline (DEA scoring, technical analysis, GA optimization) at fixed intervals (e.g., quarterly), (2) incorporating transaction costs from rebalancing trades, (3) walk-forward validation where each period uses only past data for training, and (4) handling temporal dependencies in the optimization objective. Reinforcement learning approaches could model the rebalancing policy directly, treating the portfolio as a Markov decision process.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "a98a-Q22", "q": "What is the empirical evidence that the GA converges reliably across different runs?", "a": "Multi-run analysis with K=10 independent random seeds on Communication Services showed Sharpe Ratio mean = 0.367, std = 0.007 (1.9% coefficient of variation) and total return mean = 17.96%, std = 0.48% (2.7% CV). On Information Technology, Sharpe std = 0.020 and return std = 1.5%. The low standard deviation confirms that elitism (top 10 individuals preserved) and the convergence threshold (fitness improvement < 10^-4) produce stable solutions regardless of initial population. This reliability is critical for practical deployment—investors need reproducible results, not random outcomes.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "easy", "ch": "ch3", "type": "base"}, {"id": "a98a-Q23", "q": "The thesis uses a fixed risk-free rate of 2%. How does this choice affect the evaluation, and what are the implications?", "a": "The 2% annual risk-free rate approximates the long-term post-2008 average yield of U.S. Treasury bonds, though short-term yields exceeded 4% in 2023. Using a fixed rate ensures consistency across different backtest periods and does not affect relative comparisons between portfolio and benchmark—both use the same Rf. If a time-varying risk-free rate were used, the absolute Sharpe Ratio values would change, but the ranking of portfolio vs. SPY would remain similar because both would be adjusted proportionally. The fixed rate prioritizes comparability over point-in-time accuracy.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch4", "type": "base"}, {"id": "a98a-Q24", "q": "What is the relationship between DEA efficiency scores and the RFSI distribution shown in Figure 3.11?", "a": "Figure 3.11 shows that RFSI scores exhibit a right-skewed distribution with many firms clustered near 1.0. This is a well-known property of DEA: because the BCC model constructs the efficiency frontier from the data itself, firms that are \"best in class\" on any single dimension automatically receive high scores. This makes the technical scoring layer essential for differentiating among the many near-efficient firms—without technical analysis, almost all firms in a homogeneous sector would pass the DEA filter, negating the selection value.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "easy", "ch": "ch2", "type": "base"}, {"id": "a98a-Q25", "q": "How does the framework's modular architecture support reproducibility and extensibility?", "a": "The implementation is fully modular: (1) All parameters are configurable through a central config file (params.py), eliminating hard-coded magic numbers. (2) Each pipeline phase is encapsulated in a separate module (fetch_financials/, dea/, technical/, optimization/, evaluation/), allowing new indicators or fitness functions to be added without modifying existing code. (3) API calls are cached with 30-day validity, enabling iterative experimentation without redundant data fetching. (4) The temporal split is enforced programmatically, preventing accidental in-sample leakage. (5) All 77 unit tests pass, providing a regression suite for verifying correctness. This design ensures that researchers can replicate experiments, substitute alternative methods, or extend the framework to new domains without re-engineering the entire pipeline.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch3", "type": "base"}, {"id": "gotcha-1", "q": "Your thesis claims to avoid survivorship bias, yet Table 4.1 states you analyzed 'current S&P 500 constituents' and Section 4.7.2 explicitly acknowledges survivorship bias in the limitations. Companies that were delisted, went bankrupt, or were removed from the index during your 2024-2026 backtest are completely absent from your training data. How can you claim your 53% Communication Services return is realistic when your model never learned from failures?", "a": "You are correct that this is a significant limitation. The pipeline uses the S&P 500 constituent list as of the analysis date, which means companies that exited the index (due to bankruptcy, acquisition, or poor performance) during the backtest period are excluded from both training and evaluation. This artificially inflates performance because the universe is pre-filtered for survivors. A realistic implementation would need to use point-in-time constituent lists, requiring historical index membership data that was not available for this research. Future work should incorporate delisted securities to provide unbiased performance estimates.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "ch4", "type": "gotcha"}, {"id": "gotcha-2", "q": "Section 4.7.2 states the portfolio uses 'single-period optimization without rebalancing' and Table 4.2 confirms 'Rebalancing: None (buy-and-hold)'. This means your Communication Services portfolio was constructed in January 2024 and held unchanged for two years. Real portfolios rebalance monthly or quarterly. How is your 53% return comparable to SPY, which continuously rebalances as companies enter and exit the index?", "a": "This is a valid criticism. The buy-and-hold assumption simplifies evaluation but is unrealistic for active management. Real-world portfolios rebalance to maintain target weights, respond to changing fundamentals, and harvest tax losses. SPY itself rebalances quarterly to track index changes, giving it an adaptive advantage the framework lacks. The observed outperformance may partially reflect luck in the initial asset selection rather than sustained skill. Extending the framework to support periodic rebalancing (e.g., quarterly re-optimization with transaction cost modeling) is the most important direction for future work to make the strategy deployable.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "ch4", "type": "gotcha"}, {"id": "gotcha-3", "q": "The cross-sector results in Table 4.7 show that 10 sectors were attempted, but Financials 'failed due to a dimensionality mismatch in the DEA model.' Financials is the second-largest GICS sector with 73 companies—20% of your dataset. You're presenting a portfolio optimization framework that cannot handle one-fifth of the market. How is this a general solution?", "a": "This is a fundamental limitation of the approach. The Financials sector failure occurs because banks, insurance companies, and asset managers have structurally different balance sheets—a bank's 'debt' is depositor liabilities (an operational necessity), while for industrials it is financing. The standardized 18-metric framework cannot accommodate this heterogeneity without excessive missing values. A production-ready system would require sector-specific metric definitions and separate DEA models for each financial sub-industry. The current implementation is a proof-of-concept demonstrating the integrated pipeline on homogeneous sectors, not a universal solution.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "cross", "type": "gotcha"}, {"id": "gotcha-4", "q": "Algorithm 3.1 shows your DEA categorization optimizes input/output assignment by maximizing correlation with stock returns over the training period (2022-2024). This is textbook in-sample optimization—you're tuning the model on the same data it will later use to select assets. Section 3.3.2 defends this by saying 'none of the out-of-sample evaluation data is used,' but that's a red herring. The real problem is that your categorization is data-mined to fit 2022-2024 returns. Why should we expect those correlations to persist?", "a": "This is a valid concern. The categorization is indeed optimized on training-period returns, which means it could overfit to 2022-2024 market conditions. The defense is that (1) the optimization only occurs once, not iteratively, limiting the degrees of freedom consumed; (2) the financial-theory-informed initial categorization provides a strong starting point; and (3) the two-year out-of-sample backtest provides some evidence that the correlations persist. However, a more rigorous approach would reserve a separate holdout period exclusively for categorization tuning, or use cross-validation across multiple non-overlapping windows. This limitation is acknowledged in Section 3.3.2 but deserves more prominent treatment.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "ch3", "type": "gotcha"}, {"id": "gotcha-5", "q": "Section 3.5.2 presents four fitness functions: Sharpe Ratio, Sharpe with Diversity, Total Return, and Total Return with Diversity. Yet your entire evaluation uses only 'Sharpe Ratio with Diversity Penalty.' Why didn't you compare these fitness functions against each other? How do we know Sharpe with Diversity is optimal? This looks like you ran one configuration and called it done.", "a": "You are correct that this is an unexplored dimension of the parameter space. The Sharpe with Diversity configuration was chosen based on prior literature and the observation that unconstrained Sharpe maximization produces degenerate one-stock portfolios. However, comparing all four fitness functions across sectors would have provided valuable insights—for example, whether Total Return objectives perform better in momentum markets. The omission reflects resource constraints during thesis execution rather than a principled choice. A grid search over fitness function, risk aversion, and diversity penalty across multiple sectors would be the natural next step.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "cross", "type": "gotcha"}, {"id": "gotcha-6", "q": "The Information Technology portfolio in Table 4.5 returned only 37.90% versus SPY's 47.84%, with a Sharpe Ratio of 0.65 versus 1.205. Section 4.3.3 explains this by saying DEA selected 'fundamentally efficient mid-caps' instead of NVIDIA and Apple. But this directly contradicts your central claim that DEA identifies stocks that will outperform. Your model systematically missed the mega-cap rally. Is DEA fundamentally broken for momentum-driven sectors?", "a": "This result exposes a fundamental limitation: DEA identifies operational efficiency (profit margins, leverage ratios) relative to peers, which does not guarantee stock price appreciation in momentum-driven markets. The IT sector underperformance demonstrates that ratio-based efficiency and market returns can decouple, particularly when investor sentiment concentrates capital in a few mega-caps. The framework is effective in sectors where operational efficiency correlates with returns (Communication Services, Utilities) but fails when market dynamics favor growth narratives over current fundamentals. This sector-dependent effectiveness is a key finding, not a bug—it defines the boundary conditions for when DEA-based selection is appropriate.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "ch4", "type": "gotcha"}, {"id": "gotcha-7", "q": "Table 4.4 shows the 'conservative' risk aversion portfolio (alpha=0.2) has 81% return, 21.6% volatility, and -24.11% max drawdown. Table 4.1 shows SPY has 47% return, 16.4% volatility, and -18.76% drawdown. Your 'conservative' portfolio is objectively riskier than the benchmark on every volatility measure. How is selecting only 6 assets with 25% deeper drawdowns 'conservative'?", "a": "The terminology is misleading, and you are right to call this out. 'Conservative' refers to conservative selection—the filter is strict, retaining only the top 10% of assets by combined score. This does not imply low risk; in fact, concentrating capital in fewer assets increases both upside potential and drawdown risk. A better term would be 'selective' or 'high-conviction.' The framework conflates two meanings of 'conservative': confidence in asset quality versus portfolio risk profile. The parameter should be renamed to 'selection_stringency' to avoid this confusion. The key insight remains: stricter filtering amplifies both returns and volatility.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "ch4", "type": "gotcha"}, {"id": "gotcha-8", "q": "Section 4.8.2 reports bootstrap 95% confidence intervals for the Communication Services portfolio Sharpe Ratio of [-0.28, 2.90]. The lower bound is negative. Your point estimate of 1.101 falls within a confidence interval that includes zero Sharpe—meaning you cannot reject the hypothesis that the portfolio has no excess return over the risk-free rate. How is this 'statistically significant' outperformance?", "a": "You are correct that the wide confidence interval reflects substantial uncertainty. Even with two years of data, financial return estimation is inherently noisy, and the bootstrap method correctly captures this uncertainty. The point estimate of 1.101 is positive and exceeds SPY's Sharpe in the Communication Services case, but the CI width means we cannot claim statistical significance at the 95% level from a single sector experiment. The cross-sector analysis across 10 independent sectors provides additional evidence, but the honest answer is that longer evaluation periods (5+ years) or pooled analysis across multiple market regimes would be needed to achieve narrow confidence intervals. This limitation is acknowledged but deserves more prominent discussion.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "ch4", "type": "gotcha"}, {"id": "gotcha-9", "q": "Section 4.9.2 states you compared portfolios to SPY (the broad S&P 500) rather than sector-specific ETFs like XLC for Communication Services or XLK for Information Technology. This makes it impossible to determine whether your outperformance comes from sector selection or stock selection. If Communication Services as a whole rallied 60% and your portfolio returned 53%, you actually underperformed the sector. Why didn't you use the proper benchmark?", "a": "This is a significant methodological limitation. Using sector-specific ETFs would isolate stock-selection alpha from sector beta, providing clearer attribution of value-added. The SPY comparison conflates two effects: the sector's performance relative to the broad market, and the portfolio's performance relative to its sector peers. If Communication Services outperformed the S&P 500 as a sector, then my 53% return might actually represent underperformance within the sector. The sector ETF benchmarks were not used due to data availability constraints during the research, but future work should definitely adopt sector-specific comparisons to make valid claims about stock-selection skill.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "ch4", "type": "gotcha"}, {"id": "gotcha-10", "q": "Your backtest spans January 2024 to January 2026—exactly two years, capturing the post-COVID bull market and early 2025. This is a single, contiguous, largely bullish period. Table 4.7 shows average sector return of 21.91%. You have no evidence your framework works in bear markets, high-inflation regimes, or financial crises. Two years is barely one business cycle. Why should we believe this generalizes?", "a": "This is a fair criticism. The two-year window is constrained by data availability and thesis timeline, and while it includes the early-2025 correction, it is predominantly bullish. The framework has not been tested during sustained bear markets (2008, 2022), high-inflation periods, or liquidity crises when correlations spike and diversification breaks down. The DEA-based selection might perform poorly in flight-to-quality regimes where investors abandon mid-caps for mega-cap safety. A robust evaluation would require rolling-window backtesting across at least 10-15 years, covering multiple market regimes. The current results demonstrate proof-of-concept but not regime-invariant robustness.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "ch4", "type": "gotcha"}, {"id": "gotcha-11", "q": "Section 3.5.2 states the composite technical score uses 'default equal weights: w_BB = w_RSI = w_EMA = w_MACD = 0.25.' Section 4.5.4 admits this weighting 'was not systematically explored' and that 'equal weighting may be suboptimal' because EMA and MACD are binary while BB and RSI are continuous. You're using an arbitrary weighting scheme that you admit is probably wrong. Did you test anything else, or did you just use 0.25 because it's easy to code?", "a": "You are right to press on this. The equal weighting was adopted as a theoretically neutral baseline (maximum entropy prior), not because it was validated as optimal. No systematic exploration of the weight simplex was conducted due to time constraints. The observation that binary indicators provide less differentiation is valid, and configurations weighting BB/RSI more heavily might improve performance. A grid search over technical indicator weights, evaluated via cross-validated backtest Sharpe, would be straightforward to implement and is an obvious gap. This is acknowledged in Section 4.5.4 but should have been an experimental priority rather than a future work item.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "ch3", "type": "gotcha"}, {"id": "gotcha-12", "q": "Why didn't you compare your GA-optimized portfolios to simpler baselines like equal-weight portfolios of the same filtered assets, or random portfolios? Without these comparisons, how do we know the GA is adding value versus just benefiting from the DEA filter? Maybe the asset selection does all the work and the GA optimization is unnecessary complexity.", "a": "This is an excellent point and a clear experimental gap. Comparing the GA-optimized weights to equal-weight and random-weight portfolios constructed from the same filtered asset set would isolate the GA's contribution. If an equal-weight portfolio of the same 8 Communication Services assets achieved similar Sharpe, it would suggest the DEA filter is the primary value driver and the GA is overhead. This comparison is straightforward to implement and should have been a baseline experiment. The omission reflects an implicit assumption that optimization is necessary, which should have been empirically validated rather than assumed.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "cross", "type": "gotcha"}, {"id": "gotcha-13", "q": "Table 3.2 shows your GA uses 100 population size, 200 max generations, 0.7 crossover rate, 0.1 mutation rate. Section 3.5.3 states these 'follow established guidelines from the literature.' But Section 4.5.3 admits GA parameter sensitivity was not thoroughly tested. You're using hyperparameters from papers that solved different problems (likely classic mean-variance optimization), not DEA-filtered portfolios with diversity penalties. How do you know these are appropriate?", "a": "You are correct that the GA parameters were adopted from general portfolio optimization literature without tuning for this specific problem. The parameter ranges cited (50-200 population, 0.6-0.9 crossover) are generic heuristics, not problem-specific optima. A proper experimental design would run a hyperparameter sweep (population size, mutation rate, diversity penalty) with cross-validation to find the configuration that maximizes out-of-sample Sharpe. The sensitivity analysis in Section 4.5.3 acknowledges these parameters affect outcomes but does not provide a grid search. This represents a methodological shortcut—using 'reasonable defaults' rather than optimized settings—which could leave performance on the table.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "ch3", "type": "gotcha"}, {"id": "gotcha-14", "q": "Section 3.6 states the backtesting uses 'Transaction Cost: 0.1% per trade' and Section 4.7.2 acknowledges this is 'simplified' and 'does not capture real-world bid-ask spreads or market impact.' For a 30% position in Teledyne (a mid-cap with ~$1M daily volume), buying $30,000 worth of stock would move the market. Your 0.1% flat cost is fictional. How much of your outperformance disappears with realistic costs?", "a": "This is a significant practical limitation. The 0.1% flat cost approximates online broker commissions but ignores bid-ask spreads (which widen for mid-caps), market impact (price movement caused by large orders), and timing risk (slippage between decision and execution). For mid-cap positions like Teledyne or Trimble, realistic transaction costs could be 0.5-1.0% or higher for large trades. A buy-and-hold strategy (as used here) minimizes trading frequency, but the initial portfolio construction in January 2024 would incur these costs on all positions. A back-of-envelope estimate suggests realistic costs could reduce total return by 2-5 percentage points, which would erode but not eliminate the Communication Services outperformance. Incorporating a price-impact model based on asset liquidity is essential for deployment.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "ch4", "type": "gotcha"}, {"id": "gotcha-15", "q": "Your framework requires a Financial Modeling Prep API subscription, Yahoo Finance data, quarterly restatement filings, manual GICS sector mapping, and assumes no short selling. A passive SPY investment requires none of this, rebalances automatically, has 0.09% expense ratio, and can be shorted. Even if your Communication Services portfolio beats SPY by 5%, after accounting for API costs, data maintenance, and the hours spent running your pipeline, is the risk-adjusted excess return worth it for a retail investor?", "a": "This is the most important practical question. For retail investors with small portfolios (<$100k), the operational overhead, data costs (~$30/month for FMP API), and opportunity cost of time likely exceed the incremental returns, especially after taxes on more frequent rebalancing. The framework is better suited for institutional investors or quantitative funds with existing data infrastructure where the marginal cost of adding this strategy is low. Additionally, the lack of short-selling support limits hedging opportunities, and the sector-constrained approach requires an active view on sector selection that passive investors may not have. The framework is a research contribution demonstrating integrated DEA-GA portfolio construction; it is not a turnkey retail product without significant operational improvements.", "jury": "Skeptical Examiner", "diff": "hard", "ch": "cross", "type": "gotcha"}, {"id": "chain-1-f1", "q": "You said BCC handles variable returns to scale. But doesn't that mean more DMUs end up on the frontier, reducing discrimination? How does this not undermine your goal of identifying the most efficient firms?", "a": "Yes, BCC typically produces higher efficiency scores than CCR—more firms reach the frontier because BCC constructs a tighter convex hull that doesn't assume proportional scaling. This is exactly why the technical scoring layer is essential: it provides a second discriminatory dimension to differentiate among the many firms that DEA identifies as near-efficient. The framework doesn't rely on DEA alone to rank assets; it combines RFSI with momentum indicators specifically to address this limitation.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "hard", "ch": "ch3", "type": "followup", "parent": "Why did you choose the BCC model over the CCR model for this application?"}, {"id": "chain-1-f2", "q": "If you had used CCR instead, how would the portfolio composition likely have changed? Would it favor large-cap firms?", "a": "CCR would penalize smaller firms operating below optimal scale, systematically favoring mega-cap companies like Apple or Microsoft that dominate on absolute scale metrics. The portfolios would likely shift toward the S&P 500's largest constituents, reducing the mid-cap exposure that characterizes the current results. This would essentially replicate market-cap weighting, defeating the purpose of using DEA for differentiated stock selection based on operational efficiency rather than size.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch3", "type": "followup", "parent": "Why did you choose the BCC model over the CCR model for this application?"}, {"id": "chain-1-f3", "q": "You mentioned output translation invariance. Walk me through a concrete example: if I add $1 billion to every firm's revenue, how does BCC preserve rankings while CCR would not?", "a": "Suppose Firm A has revenue $10B and Firm B has $5B. Under input-oriented BCC, efficiency depends on the ratio structure after the convexity constraint projects firms onto the frontier—the additive shift to $11B and $6B doesn't change which combinations of firms are feasible. Under CCR, which passes through the origin, the shift changes the cone's geometry: a firm that was on the ray through the origin is now off it, altering efficiency scores. This matters because our preprocessing adds positive constants to handle negative values like net income.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "hard", "ch": "ch3", "type": "followup", "parent": "Why did you choose the BCC model over the CCR model for this application?"}, {"id": "chain-2-f1", "q": "Your greedy algorithm maximizes correlation with stock returns on the training period. Isn't that circular reasoning—you're using market prices to define fundamental efficiency, then claiming DEA identifies mispriced assets?", "a": "It's not circular because the categorization uses returns to determine which financial structure best predicts future performance, but the actual efficiency scores are computed independently from prices using only accounting data. The market provides a signal about which operational characteristics historically mattered, but DEA then identifies firms that excel on those characteristics regardless of current valuation. Think of it as: the market tells us debt-to-equity should be an input; DEA identifies which firms have low debt-to-equity that the market hasn't fully priced in yet.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "hard", "ch": "ch4", "type": "followup", "parent": "How did you categorize the 18 financial metrics as inputs versus outputs? What c"}, {"id": "chain-2-f2", "q": "You mentioned the algorithm explores 262,142 possible categorizations. With a greedy approach, how confident are you that you found the global optimum rather than a local maximum?", "a": "I'm not confident at all—greedy search is guaranteed to miss the global optimum in most cases. The algorithm follows a single path through the exponential space, making locally optimal choices at each step. A global search or simulated annealing would be more rigorous but computationally infeasible since each candidate requires solving 500+ linear programs. The greedy solution is a pragmatic compromise: it's better than arbitrary theory-based categorization and runs in reasonable time, but optimal categorization remains an open problem.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch4", "type": "followup", "parent": "How did you categorize the 18 financial metrics as inputs versus outputs? What c"}, {"id": "chain-2-f3", "q": "If you ran the categorization on a different training period—say 2020-2022 instead of 2022-2024—would the input/output assignments change? What does that tell us about generalizability?", "a": "They almost certainly would change, particularly for metrics that behave differently in bull versus bear markets. For example, high revenue growth might correlate positively with returns in a risk-on environment but negatively during risk-off periods when investors favor profitability over growth. This regime-dependence is a fundamental limitation: the categorization is calibrated to the training period's market regime. Cross-validation across multiple non-overlapping periods would reveal whether certain categorizations are stable, but this wasn't implemented.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "hard", "ch": "ch4", "type": "followup", "parent": "How did you categorize the 18 financial metrics as inputs versus outputs? What c"}, {"id": "chain-3-f1", "q": "If most firms in a high-quality sector like Technology score 0.9+, doesn't that suggest DEA is adding little value over random selection within the sector?", "a": "It depends on whether 'little discrimination' means 'little information.' If 15 out of 20 Tech firms score above 0.9, DEA is telling us that sector is homogeneously high-quality—which is itself valuable information. The problem is that DEA alone can't rank within that cluster. But the technical scoring layer provides a second dimension: among the 15 efficient firms, momentum indicators identify which ones have positive price trends at the analysis date. So DEA filters for quality, technical indicators filter for timing.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "medium", "ch": "ch4", "type": "followup", "parent": "The thesis mentions that BCC efficiency scores can cluster near 1.0, particularl"}, {"id": "chain-3-f2", "q": "You said the technical layer compensates for DEA's clustering. But if the fundamental layer isn't discriminating, why not just use technical indicators alone and skip DEA?", "a": "Because technical indicators without fundamental filtering produce momentum portfolios that chase price trends regardless of business quality. This worked in the 2020-2021 meme stock era but fails when momentum reverses. DEA ensures you only buy momentum in fundamentally sound firms—you're riding uptrends in companies with strong balance sheets and profitability, not speculative bubbles. The two layers serve complementary roles: DEA prevents quality disasters, technical indicators prevent value traps.", "jury": "Prof. Helena Oliveira (DEA / Operations Research)", "diff": "hard", "ch": "ch4", "type": "followup", "parent": "The thesis mentions that BCC efficiency scores can cluster near 1.0, particularl"}, {"id": "chain-4-f1", "q": "You said this prevents offspring from being nearly identical to one parent. But doesn't that contradict the principle of exploitation? If both parents are highly fit, shouldn't you want to preserve one of them exactly?", "a": "That's what elitism does—the top 10 individuals are preserved unchanged each generation, so we're already protecting exact copies of the best solutions. Crossover's role is exploration: generating new weight combinations that neither parent had. If α=0.05 produced offspring nearly identical to Parent 1, that's redundant with elitism. The restricted range ensures crossover always contributes novelty rather than duplicating the selection mechanism.", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "hard", "ch": "ch4", "type": "followup", "parent": "Your arithmetic crossover uses α ~ U(0.3, 0.7) instead of the standard U(0, 1). "}, {"id": "chain-4-f2", "q": "Did you test other ranges, like U(0.4, 0.6) or U(0.2, 0.8)? How sensitive is GA performance to this parameter?", "a": "No sensitivity analysis was performed on the alpha range—this is a limitation. The U(0.3, 0.7) choice follows common practice in continuous optimization but wasn't empirically validated for this problem. A narrower range like U(0.4, 0.6) would produce more similar offspring (more exploitation), while U(0.2, 0.8) would increase diversity (more exploration). Given that convergence is fast (19-56 generations), the current range may even be too conservative—a broader range might not hurt.", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch4", "type": "followup", "parent": "Your arithmetic crossover uses α ~ U(0.3, 0.7) instead of the standard U(0, 1). "}, {"id": "chain-5-f1", "q": "You mentioned this can cause oscillation. Can you describe a concrete scenario where the repair operator fails to converge to a feasible solution?", "a": "Suppose a chromosome has weights [0.35, 0.35, 0.35, -0.05]. Step 1 clips negatives: [0.35, 0.35, 0.35, 0]. Step 2 clips to 30%: no change (already ≤30%). Step 3 normalizes: [0.333, 0.333, 0.333, 0], which now violates nothing. But if we had [0.4, 0.4, 0.4, -0.2], after clipping we get [0.4, 0.4, 0.4, 0]. Step 2 clips to 30%: [0.3, 0.3, 0.3, 0]. Normalization: [0.333, 0.333, 0.333, 0], which exceeds 30%. The code handles this with conditional logic that prevents the upscaling if it would violate max-weight.", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "hard", "ch": "ch4", "type": "followup", "parent": "How does your repair operator handle the case where normalization after clipping"}, {"id": "chain-5-f2", "q": "Would a projection-based repair operator that finds the nearest feasible point in Euclidean distance be more elegant? Why not use quadratic programming for repair?", "a": "Yes, projection onto the feasible simplex using QP would be theoretically cleaner—it minimizes L2 distance to the infeasible solution. But it's computationally expensive: you'd solve a QP for every infeasible offspring in every generation. With 100 individuals and potentially 50-70% infeasibility after mutation, that's 50-70 QP solves per generation for 200 generations. The heuristic repair operator runs in O(N) time and works well enough in practice. Elegance versus runtime—I chose runtime.", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch4", "type": "followup", "parent": "How does your repair operator handle the case where normalization after clipping"}, {"id": "chain-6-f1", "q": "You said NSGA-II produces a Pareto front requiring post-selection. But doesn't your λ parameter also require the investor to choose a trade-off? How is that different?", "a": "Good point—both require a preference specification. The difference is timing and interpretability. With a single fitness function, λ is set before optimization, producing one portfolio per λ value. With NSGA-II, you run optimization once and get 50-100 Pareto-optimal portfolios, then choose based on risk tolerance. The NSGA-II approach is more comprehensive but harder to explain to practitioners: 'here are 80 optimal portfolios, pick one' versus 'this is the optimal portfolio for your risk preference.'", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "medium", "ch": "ch4", "type": "followup", "parent": "Why don't you use multi-objective optimization (e.g., NSGA-II) to handle risk an"}, {"id": "chain-6-f2", "q": "Given that you run the GA separately for each sector anyway, couldn't you run NSGA-II once per sector without additional cost?", "a": "Yes, absolutely. The per-sector architecture means NSGA-II wouldn't increase runtime—you'd still run 10 independent optimizations. The challenge is presentation: the thesis would need to show Pareto fronts for each sector and explain how to select from them, which is more complex than showing a single optimal portfolio per case study. For the dissertation's pedagogical goals, the simpler approach was chosen, but NSGA-II is explicitly listed as future work in Chapter 6.", "jury": "Prof. Carlos Fonseca (GA / Metaheuristics)", "diff": "easy", "ch": "ch4", "type": "followup", "parent": "Why don't you use multi-objective optimization (e.g., NSGA-II) to handle risk an"}, {"id": "chain-7-f1", "q": "You set λ=0.2 without formal calibration. How do you know this doesn't systematically bias the GA away from legitimately concentrated high-Sharpe portfolios?", "a": "I don't—this is a limitation. The λ=0.2 choice is arbitrary, following rough guidelines from portfolio optimization literature but not validated for this specific problem. A concentrated portfolio (say, 50% in one asset) might genuinely maximize Sharpe Ratio, but the penalty pushes the GA toward more even allocations regardless. Proper calibration would require a grid search over λ ∈ [0, 0.5] and evaluating out-of-sample performance for each, which wasn't feasible within the thesis scope.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "hard", "ch": "ch4", "type": "followup", "parent": "What is the role of the diversity penalty parameter λ in the GA fitness function"}, {"id": "chain-7-f2", "q": "Could you adaptively adjust λ during the GA's evolution—say, start high to encourage exploration and decrease to allow convergence to concentrated solutions?", "a": "That's an interesting idea—adaptive λ would act like simulated annealing for the diversity term. Start with λ=0.5 to force broad exploration, then decay to λ=0.1 as the GA converges, allowing it to concentrate capital into top performers. This could prevent premature convergence while still finding high-Sharpe concentrated solutions. The challenge is choosing the decay schedule—too fast and you lose exploration benefits, too slow and you never converge. This would be valuable future work.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch4", "type": "followup", "parent": "What is the role of the diversity penalty parameter λ in the GA fitness function"}, {"id": "chain-8-f1", "q": "You said Bessel's correction provides an unbiased estimator. But doesn't that assume returns are i.i.d.? With momentum and mean reversion, isn't the sample variance biased regardless?", "a": "Correct—Bessel's correction only addresses sampling bias under i.i.d. returns. With serial correlation, the sample variance is still a biased estimator of the true unconditional variance. Positive autocorrelation (momentum) causes sample variance to understate true long-run variance, while negative autocorrelation (mean reversion) overstates it. The proper approach would be heteroskedasticity-and-autocorrelation-consistent (HAC) standard errors, like Newey-West estimators, but these aren't standard in portfolio evaluation. The i.i.d. assumption is acknowledged as a limitation.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "hard", "ch": "ch5", "type": "followup", "parent": "Why use Bessel's correction (N-1 denominator) for volatility calculation? How do"}, {"id": "chain-8-f2", "q": "For a 2-year backtest with 500 observations, the difference between N and N-1 is negligible. Why bother mentioning Bessel's correction at all?", "a": "It's about establishing methodological rigor. Even if the numerical impact is tiny (500 vs 499 in the denominator), using N-1 signals that I understand the statistical properties of the estimators. If I had used N, a jury member might question whether I understand bias versus consistency. It's like showing your work in math class—yes, 499/500 ≈ 1, but using the correct formula demonstrates theoretical awareness.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "easy", "ch": "ch5", "type": "followup", "parent": "Why use Bessel's correction (N-1 denominator) for volatility calculation? How do"}, {"id": "chain-9-f1", "q": "Your evaluation period (2024-2026) was predominantly a bull market with low volatility. How would this momentum-based framework perform in a prolonged bear market or sideways market?", "a": "Likely poorly. Momentum strategies systematically underperform in mean-reverting or choppy markets where price trends reverse quickly. The technical scoring layer rewards assets with strong recent performance, which becomes a liability when trends break. The DEA fundamental layer provides some downside protection—you're not buying garbage that rallies—but it won't prevent losses when entire sectors sell off. A comprehensive evaluation would need to include 2022's bear market or 2015-2016's sideways grind.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "hard", "ch": "ch5", "type": "followup", "parent": "Is a 2-year backtest sufficient to draw conclusions about a strategy's viability"}, {"id": "chain-9-f2", "q": "You could extend the backtest to 2020-2026 to include COVID-19 and the 2022 bear market. Why didn't you?", "a": "Data availability constraints. The framework requires quarterly financial statements for DEA, and the FMP API's historical coverage for all 18 metrics isn't complete before 2022 for many firms. Some metrics like 'days sales outstanding' or 'inventory turnover' have missing values prior to 2022. Additionally, the 2-year train/2-year test split leaves only 2 years for evaluation. Extending to 2020 would require a longer total window (2020-2026 = 6 years) with a 4-year train/2-year test split, which was beyond scope.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch5", "type": "followup", "parent": "Is a 2-year backtest sufficient to draw conclusions about a strategy's viability"}, {"id": "chain-9-f3", "q": "If the strategy fails in the next bear market, does that invalidate your thesis, or is regime-specific performance acceptable?", "a": "Regime-specific performance is acceptable as long as it's disclosed. No strategy works in all environments—momentum fails in reversals, value fails in growth rallies. The thesis should state: 'This framework is designed for trending markets where fundamental quality predicts continued outperformance. In mean-reverting or volatility-shock regimes, tactical cash allocation or dynamic rebalancing would be required.' The contribution is showing DEA+GA works in the tested regime, not claiming a universal solution.", "jury": "Prof. Rui Neves (Quantitative Finance / Portfolio Theory)", "diff": "medium", "ch": "ch5", "type": "followup", "parent": "Is a 2-year backtest sufficient to draw conclusions about a strategy's viability"}, {"id": "chain-10-f1", "q": "You said the GA optimizes on the training window and evaluates out-of-sample. But didn't you also optimize the DEA categorization on the training period? Isn't that a form of in-sample bias?", "a": "Yes, it is. The categorization algorithm uses training-period returns to choose input/output assignments, which is in-sample optimization. Ideally, there should be three periods: training for categorization, validation for GA parameter tuning, and test for final evaluation. The current two-period split conflates training and validation, meaning the DEA categorization is tuned to the same data used for GA training. This could cause the framework to overfit to the 2022-2024 regime, which is acknowledged as a limitation.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch4", "type": "followup", "parent": "How does the framework address the in-sample bias problem, and what temporal sep"}, {"id": "chain-10-f2", "q": "If you had a third period for categorization validation, how would you split the data? What's the minimum length for each period?", "a": "A reasonable split for 6 years of data (2020-2026) would be: 2 years for categorization training (2020-2022), 2 years for GA training (2022-2024), and 2 years for evaluation (2024-2026). Each period needs at least 8 quarters for DEA to compute meaningful per-quarter efficiency scores. The challenge is that financial metrics often aren't available before 2022 for all firms, so extending backward introduces data sparsity. This is why the thesis uses only 2022-2026 with a two-period split.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch4", "type": "followup", "parent": "How does the framework address the in-sample bias problem, and what temporal sep"}, {"id": "chain-11-f1", "q": "You said this treats selection and optimization as interdependent. But doesn't the sequential pipeline (DEA → Technical → GA) still decouple them? How is that different from just pre-filtering the universe?", "a": "The difference is that the filtering isn't arbitrary or manual—it's systematic and score-based. Traditional approaches might say 'only consider large-cap tech stocks,' which is subjective. This framework computes quantitative scores (RFSI, technical composite) and filters based on those scores plus a risk-aversion parameter. The interdependence comes from the fact that the filtering decisions directly determine what the GA can optimize over, and the risk parameter provides a feedback loop between investor preferences and the final portfolio.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch4", "type": "followup", "parent": "What is the key architectural decision that distinguishes this framework from tr"}, {"id": "chain-11-f2", "q": "Could the GA itself handle asset selection by allowing zero weights, eliminating the need for pre-filtering?", "a": "Yes, theoretically the GA could optimize over all 500 S&P constituents and naturally drive weights to zero for poor assets. But this would explode the solution space—500-dimensional optimization is much harder than 10-15 dimensions, requiring larger populations and more generations. More critically, it would lose the interpretability of the two-stage design: stakeholders want to understand why an asset was excluded ('it failed the risk filter') versus why it received low allocation ('the GA found better risk-return combinations'). The pipeline provides a clear decision trail.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch4", "type": "followup", "parent": "What is the key architectural decision that distinguishes this framework from tr"}, {"id": "chain-12-f1", "q": "You mentioned alternative approaches like simulated annealing were computationally infeasible. Did you profile the code to identify bottlenecks? Could you parallelize the DEA solves?", "a": "Yes, profiling shows that the LP solve step dominates runtime—each DEA evaluation requires solving J linear programs where J is the number of firms (typically 20-50 per sector). The good news is that these solves are embarrassingly parallel: each firm's efficiency score is independent. Using multiprocessing.Pool to parallelize across CPU cores could reduce runtime by 4-8x on modern machines, making simulated annealing feasible. This wasn't implemented but is straightforward future work.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "medium", "ch": "ch4", "type": "followup", "parent": "What is the greedy categorization algorithm used for input/output assignment in "}, {"id": "chain-12-f2", "q": "Instead of optimizing categorization to match stock returns, why not categorize based purely on financial theory—liabilities as inputs, profitability as outputs—and skip the data-driven optimization?", "a": "That's simpler and avoids in-sample bias, but it assumes financial theory is correct about which metrics drive stock performance. The data-driven approach lets the training-period returns reveal which operational characteristics actually mattered historically. For example, theory might say revenue growth is an output, but if growth stocks underperformed during the training period (like in 2022), the algorithm might categorize growth as neutral or even an input. The risk is overfitting to that regime, but the benefit is adapting to regime-specific dynamics.", "jury": "Prof. Alberto Silva (Systems / Research Methodology)", "diff": "hard", "ch": "ch4", "type": "followup", "parent": "What is the greedy categorization algorithm used for input/output assignment in "}];
+
+const CH_NAMES = {ch1:'Ch1 Intro',ch2:'Ch2 Background',ch3:'Ch3 Architecture',ch4:'Ch4 Evaluation',ch5:'Ch5 Conclusions',cross:'Cross-chapter'};
+const JURY_SHORT = {};
+ALL_CARDS.forEach(c => {
+  if (!JURY_SHORT[c.jury]) {
+    const m = c.jury.match(/Prof\.\s+(\S+\s+\S+)/);
+    JURY_SHORT[c.jury] = m ? m[1] : c.jury.split('(')[0].trim();
+  }
+});
+
+// ========== STATE ==========
+let state = JSON.parse(localStorage.getItem('thesis-fc-state') || '{}');
+// state[cardId] = { right: N, wrong: N, streak: N, lastSeen: timestamp }
+
+let filters = JSON.parse(localStorage.getItem('thesis-fc-filters') || '{}');
+// filters = { diff: [], ch: [], jury: [], type: [], status: [] }
+if (!filters.diff) filters = {diff:[], ch:[], jury:[], type:[], status:[]};
+
+let deck = [];
+let deckIdx = 0;
+let isFlipped = false;
+
+function save() { localStorage.setItem('thesis-fc-state', JSON.stringify(state)); }
+function saveFilters() { localStorage.setItem('thesis-fc-filters', JSON.stringify(filters)); }
+
+function getCardState(id) {
+  return state[id] || {right:0, wrong:0, streak:0, lastSeen:0};
+}
+
+function getStatus(id) {
+  const s = getCardState(id);
+  if (s.right === 0 && s.wrong === 0) return 'unseen';
+  if (s.streak >= 2) return 'mastered';
+  if (s.right > 0) return 'learning';
+  return 'wrong';
+}
+
+// ========== SPACED REPETITION ==========
+function buildDeck() {
+  let pool = ALL_CARDS.filter(c => {
+    if (filters.diff.length && !filters.diff.includes(c.diff)) return false;
+    if (filters.ch.length && !filters.ch.includes(c.ch)) return false;
+    if (filters.jury.length && !filters.jury.includes(c.jury)) return false;
+    if (filters.type.length && !filters.type.includes(c.type)) return false;
+    if (filters.status.length && !filters.status.includes(getStatus(c.id))) return false;
+    return true;
+  });
+
+  // Sort: wrong first, then unseen, then learning (by last seen), then mastered last
+  const priority = {wrong:0, unseen:1, learning:2, mastered:3};
+  pool.sort((a, b) => {
+    const pa = priority[getStatus(a.id)] ?? 2;
+    const pb = priority[getStatus(b.id)] ?? 2;
+    if (pa !== pb) return pa - pb;
+    const sa = getCardState(a.id), sb = getCardState(b.id);
+    return sa.lastSeen - sb.lastSeen;
+  });
+
+  deck = pool;
+  deckIdx = 0;
+}
+
+// ========== CARD RENDERING ==========
+function renderCard() {
+  const container = document.querySelector('.card-container');
+  const empty = document.getElementById('emptyState');
+  const hint = document.getElementById('cardHint');
+  const actions = document.getElementById('actionButtons');
+  const pill = document.getElementById('progressPill');
+
+  if (deckIdx >= deck.length) {
+    container.style.display = 'none';
+    hint.style.display = 'none';
+    actions.style.display = 'none';
+    empty.style.display = 'block';
+    pill.textContent = `${deck.length} / ${deck.length}`;
+    return;
+  }
+
+  container.style.display = 'block';
+  hint.style.display = 'block';
+  actions.style.display = 'none';
+  empty.style.display = 'none';
+
+  const c = deck[deckIdx];
+  const front = document.getElementById('cardFront');
+  const back = document.getElementById('cardBack');
+  const card = document.getElementById('flashcard');
+
+  isFlipped = false;
+  card.classList.remove('flipped');
+  hint.textContent = 'Tap card to reveal answer';
+
+  const diffBadge = `<span class="badge badge-${c.diff}">${c.diff}</span>`;
+  const chBadge = `<span class="badge badge-ch">${CH_NAMES[c.ch]||c.ch}</span>`;
+  const typeBadge = c.type !== 'base' ? `<span class="badge badge-type">${c.type}</span>` : '';
+  const status = getStatus(c.id);
+  const streakInfo = status !== 'unseen' ? ` &middot; streak: ${getCardState(c.id).streak}` : '';
+
+  front.innerHTML = `
+    <div class="card-badges">${diffBadge}${chBadge}${typeBadge}</div>
+    <div class="card-question">${escHtml(c.q)}</div>
+    <div class="card-jury">${JURY_SHORT[c.jury] || c.jury}${streakInfo}</div>
+  `;
+
+  const parentNote = c.parent ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-style:italic">Follow-up to: "${escHtml(c.parent)}"</div>` : '';
+
+  back.innerHTML = `
+    <div class="card-badges">${diffBadge}${chBadge}</div>
+    ${parentNote}
+    <div class="card-answer">${escHtml(c.a)}</div>
+  `;
+
+  // Ensure both faces have matching height
+  front.style.minHeight = '340px';
+  back.style.minHeight = '340px';
+
+  pill.textContent = `${deckIdx + 1} / ${deck.length}`;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\$([^$]+)\$/g, '<em style="color:#f0c929">$1</em>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+}
+
+function flipCard() {
+  if (deckIdx >= deck.length) return;
+  const card = document.getElementById('flashcard');
+  const hint = document.getElementById('cardHint');
+  const actions = document.getElementById('actionButtons');
+
+  if (!isFlipped) {
+    card.classList.add('flipped');
+    isFlipped = true;
+    hint.textContent = 'How did you do?';
+    actions.style.display = 'flex';
+  } else {
+    card.classList.remove('flipped');
+    isFlipped = false;
+    hint.textContent = 'Tap card to reveal answer';
+    actions.style.display = 'none';
+  }
+}
+
+function answer(correct) {
+  const c = deck[deckIdx];
+  const s = getCardState(c.id);
+  if (correct) {
+    s.right++;
+    s.streak++;
+  } else {
+    s.wrong++;
+    s.streak = 0;
+  }
+  s.lastSeen = Date.now();
+  state[c.id] = s;
+  save();
+  deckIdx++;
+  renderCard();
+}
+
+function skipCard() {
+  deckIdx++;
+  renderCard();
+}
+
+function restartSession() {
+  buildDeck();
+  renderCard();
+}
+
+// ========== SCREENS ==========
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+
+  if (name === 'stats') renderStats();
+  if (name === 'filter') renderFilters();
+}
+
+// ========== FILTERS ==========
+function renderFilters() {
+  renderChipGroup('diffChips', ['easy','medium','hard'], filters.diff);
+  renderChipGroup('chChips', Object.keys(CH_NAMES), filters.ch, v => CH_NAMES[v]);
+  const juries = [...new Set(ALL_CARDS.map(c=>c.jury))].sort();
+  renderChipGroup('juryChips', juries, filters.jury, v => JURY_SHORT[v]||v);
+  renderChipGroup('typeChips', ['base','gotcha','followup'], filters.type);
+  renderChipGroup('statusChips', ['unseen','wrong','learning','mastered'], filters.status);
+}
+
+function renderChipGroup(containerId, values, active, labelFn) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = values.map(v => {
+    const label = labelFn ? labelFn(v) : v;
+    const isActive = active.includes(v) ? 'active' : '';
+    return `<span class="chip ${isActive}" data-value="${escAttr(v)}" onclick="toggleChip(this,'${containerId}')">${label}</span>`;
+  }).join('');
+}
+
+function escAttr(s) { return s.replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+function toggleChip(el, groupId) {
+  el.classList.toggle('active');
+}
+
+function applyFilters() {
+  filters.diff = getActiveChips('diffChips');
+  filters.ch = getActiveChips('chChips');
+  filters.jury = getActiveChips('juryChips');
+  filters.type = getActiveChips('typeChips');
+  filters.status = getActiveChips('statusChips');
+  saveFilters();
+  buildDeck();
+  showScreen('study');
+  renderCard();
+}
+
+function clearFilters() {
+  filters = {diff:[], ch:[], jury:[], type:[], status:[]};
+  saveFilters();
+  renderFilters();
+}
+
+function getActiveChips(containerId) {
+  return [...document.querySelectorAll(`#${containerId} .chip.active`)].map(c => {
+    // Decode HTML entities back
+    const div = document.createElement('div');
+    div.innerHTML = c.dataset.value;
+    return div.textContent;
+  });
+}
+
+// ========== STATS ==========
+function renderStats() {
+  const total = ALL_CARDS.length;
+  let seen=0, mastered=0, learning=0, struggling=0;
+  ALL_CARDS.forEach(c => {
+    const st = getStatus(c.id);
+    if (st !== 'unseen') seen++;
+    if (st === 'mastered') mastered++;
+    if (st === 'learning') learning++;
+    if (st === 'wrong') struggling++;
+  });
+
+  document.getElementById('sTotalCards').textContent = total;
+  document.getElementById('sSeenCards').textContent = seen;
+  document.getElementById('sMastered').textContent = mastered;
+  document.getElementById('sLearning').textContent = learning;
+  document.getElementById('sStruggling').textContent = struggling;
+  document.getElementById('progressBar').style.width = `${(mastered/total*100).toFixed(1)}%`;
+
+  // By difficulty
+  const byDiff = document.getElementById('statsByDiff');
+  byDiff.innerHTML = '';
+  ['easy','medium','hard'].forEach(d => {
+    const subset = ALL_CARDS.filter(c=>c.diff===d);
+    const m = subset.filter(c=>getStatus(c.id)==='mastered').length;
+    const pct = subset.length ? (m/subset.length*100).toFixed(0) : 0;
+    byDiff.innerHTML += `<div class="stat-row"><span class="stat-label">${d} (${subset.length})</span><span class="stat-value">${m} mastered (${pct}%)</span></div>`;
+  });
+
+  // By chapter
+  const byCh = document.getElementById('statsByCh');
+  byCh.innerHTML = '';
+  Object.keys(CH_NAMES).forEach(ch => {
+    const subset = ALL_CARDS.filter(c=>c.ch===ch);
+    if (!subset.length) return;
+    const m = subset.filter(c=>getStatus(c.id)==='mastered').length;
+    const pct = (m/subset.length*100).toFixed(0);
+    byCh.innerHTML += `<div class="stat-row"><span class="stat-label">${CH_NAMES[ch]} (${subset.length})</span><span class="stat-value">${m} mastered (${pct}%)</span></div>`;
+  });
+
+  // Mastery grid
+  const grid = document.getElementById('masteryGrid');
+  grid.innerHTML = ALL_CARDS.map(c => `<div class="mastery-dot ${getStatus(c.id)}"></div>`).join('');
+}
+
+function resetStats() {
+  if (confirm('Reset all progress? This cannot be undone.')) {
+    state = {};
+    save();
+    buildDeck();
+    renderCard();
+    renderStats();
+  }
+}
+
+// ========== INIT ==========
+buildDeck();
+renderCard();
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+  if (e.key === 'ArrowLeft' || e.key === '1') { if(isFlipped) answer(false); }
+  if (e.key === 'ArrowRight' || e.key === '3') { if(isFlipped) answer(true); }
+  if (e.key === 'ArrowDown' || e.key === '2') { if(isFlipped) skipCard(); }
+});
+
+// Swipe support
+let touchStartX = 0;
+document.querySelector('.card-container').addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].screenX;
+}, {passive:true});
+document.querySelector('.card-container').addEventListener('touchend', e => {
+  if (!isFlipped) return;
+  const dx = e.changedTouches[0].screenX - touchStartX;
+  if (dx > 60) answer(true);
+  else if (dx < -60) answer(false);
+}, {passive:true});
+</script>
+</body>
+</html>
