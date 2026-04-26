@@ -470,6 +470,10 @@ function buildDeck() {
   deckIdx = 0;
 }
 
+function getSeenCount() {
+  return ALL_CARDS.filter(c => getStatus(c.id) !== 'unseen').length;
+}
+
 // ========== CARD RENDERING ==========
 function renderCard() {
   const container = document.querySelector('.card-container');
@@ -483,7 +487,7 @@ function renderCard() {
     hint.style.display = 'none';
     actions.style.display = 'none';
     empty.style.display = 'block';
-    pill.textContent = `${deck.length} / ${deck.length}`;
+    pill.textContent = `${getSeenCount()} / ${ALL_CARDS.length} seen`;
     return;
   }
 
@@ -525,7 +529,7 @@ function renderCard() {
   front.style.minHeight = '340px';
   back.style.minHeight = '340px';
 
-  pill.textContent = `${deckIdx + 1} / ${deck.length}`;
+  pill.textContent = `${getSeenCount()} / ${ALL_CARDS.length} seen`;
 }
 
 function escHtml(s) {
